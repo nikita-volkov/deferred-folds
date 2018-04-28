@@ -90,3 +90,14 @@ fold (Fold step init extract) (FoldlView run) = extract (run step init)
 {-# INLINE foldable #-}
 foldable :: Foldable foldable => foldable a -> FoldlView a
 foldable foldable = FoldlView (\ step init -> A.foldl' step init foldable)
+
+{-| Ints in the specified inclusive range -}
+intsInRange :: Int -> Int -> FoldlView Int
+intsInRange from to =
+  FoldlView $ \ step init ->
+  let
+    loop !state int =
+      if int <= to
+        then loop (step state int) (succ int)
+        else state
+    in loop init from
