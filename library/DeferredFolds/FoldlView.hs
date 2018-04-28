@@ -1,4 +1,4 @@
-module DeferredFolds.ToBeFoldled
+module DeferredFolds.FoldlView
 where
 
 import DeferredFolds.Prelude
@@ -30,63 +30,63 @@ Which in Haskell is essentially the same as
 
 We can isolate that part into an abstraction:
 
->newtype ToBeFoldled a = ToBeFoldled (forall b. (b -> a -> b) -> b -> b)
+>newtype FoldlView a = FoldlView (forall b. (b -> a -> b) -> b -> b)
 
 Then we get to this simple morphism:
 
->foldl' :: [a] -> ToBeFoldled a
+>foldl' :: [a] -> FoldlView a
 
 -}
-newtype ToBeFoldled input =
-  ToBeFoldled (forall output. (output -> input -> output) -> output -> output)
+newtype FoldlView input =
+  FoldlView (forall output. (output -> input -> output) -> output -> output)
 
-deriving instance Functor ToBeFoldled
+deriving instance Functor FoldlView
 
-instance Applicative ToBeFoldled where
+instance Applicative FoldlView where
   pure x =
-    ToBeFoldled (\ step init -> step init x)
+    FoldlView (\ step init -> step init x)
   (<*>) = ap
 
-instance Alternative ToBeFoldled where
+instance Alternative FoldlView where
   empty =
-    ToBeFoldled (const id)
+    FoldlView (const id)
   {-# INLINE (<|>) #-}
-  (<|>) (ToBeFoldled left) (ToBeFoldled right) =
-    ToBeFoldled (\ step init -> right step (left step init))
+  (<|>) (FoldlView left) (FoldlView right) =
+    FoldlView (\ step init -> right step (left step init))
 
-instance Monad ToBeFoldled where
+instance Monad FoldlView where
   return = pure
-  (>>=) (ToBeFoldled left) rightK =
-    ToBeFoldled $ \ step init ->
+  (>>=) (FoldlView left) rightK =
+    FoldlView $ \ step init ->
     let
       newStep output x =
         case rightK x of
-          ToBeFoldled right ->
+          FoldlView right ->
             right step output
       in left newStep init
 
-instance MonadPlus ToBeFoldled where
+instance MonadPlus FoldlView where
   mzero = empty
   mplus = (<|>)
 
-instance Semigroup (ToBeFoldled a) where
+instance Semigroup (FoldlView a) where
   (<>) = (<|>)
 
-instance Monoid (ToBeFoldled a) where
+instance Monoid (FoldlView a) where
   mempty = empty
   mappend = (<>)
 
 {-| Perform a strict left fold -}
 {-# INLINE foldl' #-}
-foldl' :: (output -> input -> output) -> output -> ToBeFoldled input -> output
-foldl' step init (ToBeFoldled run) = run step init
+foldl' :: (output -> input -> output) -> output -> FoldlView input -> output
+foldl' step init (FoldlView run) = run step init
 
 {-| Apply a Gonzalez fold -}
 {-# INLINE fold #-}
-fold :: Fold input output -> ToBeFoldled input -> output
-fold (Fold step init extract) (ToBeFoldled run) = extract (run step init)
+fold :: Fold input output -> FoldlView input -> output
+fold (Fold step init extract) (FoldlView run) = extract (run step init)
 
 {-| Construct from any foldable -}
 {-# INLINE foldable #-}
-foldable :: Foldable foldable => foldable a -> ToBeFoldled a
-foldable foldable = ToBeFoldled (\ step init -> A.foldl' step init foldable)
+foldable :: Foldable foldable => foldable a -> FoldlView a
+foldable foldable = FoldlView (\ step init -> A.foldl' step init foldable)
