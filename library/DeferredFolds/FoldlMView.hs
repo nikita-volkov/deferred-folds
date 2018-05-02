@@ -5,6 +5,9 @@ import DeferredFolds.Prelude hiding (foldl')
 import qualified DeferredFolds.Prelude as A
 
 
+{-|
+A monadic variation of "DeferredFolds.FoldView"
+-}
 newtype FoldlMView input =
   FoldlMView (forall m output. Monad m => (output -> input -> m output) -> output -> m output)
 
@@ -52,10 +55,25 @@ foldl' step init (FoldlMView run) =
   where
     identityStep state input = return (step state input)
 
+{-| Perform a monadic strict left fold -}
+{-# INLINE foldlM' #-}
+foldlM' :: Monad m => (output -> input -> m output) -> output -> FoldlMView input -> m output
+foldlM' step init (FoldlMView run) =
+  run step init
+
 {-| Apply a Gonzalez fold -}
 {-# INLINE fold #-}
 fold :: Fold input output -> FoldlMView input -> output
 fold (Fold step init extract) = extract . foldl' step init
+
+{-| Apply a monadic Gonzalez fold -}
+{-# INLINE foldM #-}
+foldM :: Monad m => FoldM m input output -> FoldlMView input -> m output
+foldM (FoldM step init extract) view =
+  do
+    initialState <- init
+    finalState <- foldlM' step initialState view
+    extract finalState
 
 {-| Construct from any foldable -}
 {-# INLINE foldable #-}

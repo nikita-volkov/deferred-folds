@@ -19,4 +19,4 @@ import Control.Monad as Exports
 
 -- foldl
 -------------------------
-import Control.Foldl as Exports (Fold(..))
+import Control.Foldl as Exports (Fold(..), FoldM(..))
