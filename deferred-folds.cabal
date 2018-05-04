@@ -39,8 +39,8 @@ library
   default-language:
     Haskell2010
   exposed-modules:
-    DeferredFolds.FoldlView
-    DeferredFolds.FoldlMView
+    DeferredFolds.Unfold
+    DeferredFolds.UnfoldM
   other-modules:
     DeferredFolds.Prelude
   build-depends:

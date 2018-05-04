@@ -1,4 +1,4 @@
-module DeferredFolds.FoldlView
+module DeferredFolds.Unfold
 where
 
 import DeferredFolds.Prelude
@@ -30,71 +30,71 @@ Which in Haskell is essentially the same as
 
 We can isolate that part into an abstraction:
 
->newtype FoldlView a = FoldlView (forall b. (b -> a -> b) -> b -> b)
+>newtype Unfold a = Unfold (forall b. (b -> a -> b) -> b -> b)
 
 Then we get to this simple morphism:
 
->foldl' :: [a] -> FoldlView a
+>foldl' :: [a] -> Unfold a
 
 -}
-newtype FoldlView input =
-  FoldlView (forall output. (output -> input -> output) -> output -> output)
+newtype Unfold input =
+  Unfold (forall output. (output -> input -> output) -> output -> output)
 
-deriving instance Functor FoldlView
+deriving instance Functor Unfold
 
-instance Applicative FoldlView where
+instance Applicative Unfold where
   pure x =
-    FoldlView (\ step init -> step init x)
+    Unfold (\ step init -> step init x)
   (<*>) = ap
 
-instance Alternative FoldlView where
+instance Alternative Unfold where
   empty =
-    FoldlView (const id)
+    Unfold (const id)
   {-# INLINE (<|>) #-}
-  (<|>) (FoldlView left) (FoldlView right) =
-    FoldlView (\ step init -> right step (left step init))
+  (<|>) (Unfold left) (Unfold right) =
+    Unfold (\ step init -> right step (left step init))
 
-instance Monad FoldlView where
+instance Monad Unfold where
   return = pure
-  (>>=) (FoldlView left) rightK =
-    FoldlView $ \ step init ->
+  (>>=) (Unfold left) rightK =
+    Unfold $ \ step init ->
     let
       newStep output x =
         case rightK x of
-          FoldlView right ->
+          Unfold right ->
             right step output
       in left newStep init
 
-instance MonadPlus FoldlView where
+instance MonadPlus Unfold where
   mzero = empty
   mplus = (<|>)
 
-instance Semigroup (FoldlView a) where
+instance Semigroup (Unfold a) where
   (<>) = (<|>)
 
-instance Monoid (FoldlView a) where
+instance Monoid (Unfold a) where
   mempty = empty
   mappend = (<>)
 
 {-| Perform a strict left fold -}
 {-# INLINE foldl' #-}
-foldl' :: (output -> input -> output) -> output -> FoldlView input -> output
-foldl' step init (FoldlView run) = run step init
+foldl' :: (output -> input -> output) -> output -> Unfold input -> output
+foldl' step init (Unfold run) = run step init
 
 {-| Apply a Gonzalez fold -}
 {-# INLINE fold #-}
-fold :: Fold input output -> FoldlView input -> output
-fold (Fold step init extract) (FoldlView run) = extract (run step init)
+fold :: Fold input output -> Unfold input -> output
+fold (Fold step init extract) (Unfold run) = extract (run step init)
 
 {-| Construct from any foldable -}
 {-# INLINE foldable #-}
-foldable :: Foldable foldable => foldable a -> FoldlView a
-foldable foldable = FoldlView (\ step init -> A.foldl' step init foldable)
+foldable :: Foldable foldable => foldable a -> Unfold a
+foldable foldable = Unfold (\ step init -> A.foldl' step init foldable)
 
 {-| Ints in the specified inclusive range -}
-intsInRange :: Int -> Int -> FoldlView Int
+intsInRange :: Int -> Int -> Unfold Int
 intsInRange from to =
-  FoldlView $ \ step init ->
+  Unfold $ \ step init ->
   let
     loop !state int =
       if int <= to
