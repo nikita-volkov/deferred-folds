@@ -6,7 +6,7 @@ import qualified DeferredFolds.Prelude as A
 
 
 {-|
-A monadic variation of "DeferredFolds.FoldView"
+A monadic variation of "DeferredFolds.FoldlView"
 -}
 newtype FoldlMView m input =
   FoldlMView (forall output. (output -> input -> m output) -> output -> m output)
