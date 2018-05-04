@@ -34,8 +34,28 @@ We can isolate that part into an abstraction:
 
 Then we get to this simple morphism:
 
->foldl' :: [a] -> Unfold a
+>list :: [a] -> Unfold a
+>list list = Unfold (\ step init -> foldl' step init list)
 
+We can do the same with say "Data.Text.Text":
+
+>text :: Text -> Unfold Char
+>text text = Unfold (\ step init -> Data.Text.foldl' step init text)
+
+And then we can use those both to concatenate with just an @O(1)@ cost:
+
+>abcdef :: Unfold Char
+>abcdef = list ['a', 'b', 'c'] <> text "def"
+
+Please notice that up until this moment no actual data materialization has happened and
+hence no traversals have appeared.
+All that we've done is just composed a function,
+which only specifies which parts of data structures to traverse to perform a left-fold.
+Only at the moment where the actual folding will happen will we actually traverse the source data.
+E.g., using the "fold" function:
+
+>abcdefLength :: Int
+>abcdefLength = fold Control.Foldl.length abcdef
 -}
 newtype Unfold input =
   Unfold (forall output. (output -> input -> output) -> output -> output)
