@@ -3,6 +3,8 @@ where
 
 import DeferredFolds.Prelude
 import qualified DeferredFolds.Prelude as A
+import qualified Data.Map.Strict as C
+import qualified Data.IntMap.Strict as D
 
 
 {-|
@@ -112,6 +114,7 @@ foldable :: Foldable foldable => foldable a -> Unfold a
 foldable foldable = Unfold (\ step init -> A.foldl' step init foldable)
 
 {-| Ints in the specified inclusive range -}
+{-# INLINE intsInRange #-}
 intsInRange :: Int -> Int -> Unfold Int
 intsInRange from to =
   Unfold $ \ step init ->
@@ -121,3 +124,13 @@ intsInRange from to =
         then loop (step state int) (succ int)
         else state
     in loop init from
+
+{-# INLINE map #-}
+map :: Map key value -> Unfold (key, value)
+map map =
+  Unfold (\ step init -> C.foldlWithKey' (\ state key value -> step state (key, value)) init map)
+
+{-# INLINE intMap #-}
+intMap :: IntMap value -> Unfold (Int, value)
+intMap intMap =
+  Unfold (\ step init -> D.foldlWithKey' (\ state key value -> step state (key, value)) init intMap)

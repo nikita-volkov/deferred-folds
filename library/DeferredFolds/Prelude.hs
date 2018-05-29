@@ -17,6 +17,14 @@ import Data.Traversable as Exports
 import Control.Applicative as Exports
 import Control.Monad as Exports
 
+-- containers
+-------------------------
+import Data.IntMap.Strict as Exports (IntMap)
+import Data.Map.Strict as Exports (Map)
+import Data.IntSet as Exports (IntSet)
+import Data.Set as Exports (Set)
+import Data.Sequence as Exports (Seq)
+
 -- foldl
 -------------------------
 import Control.Foldl as Exports (Fold(..), FoldM(..))
