@@ -98,10 +98,14 @@ instance Monoid (Unfold a) where
   mempty = empty
   mappend = (<>)
 
-{-| Perform a strict left fold -}
-{-# INLINE foldl' #-}
-foldl' :: (output -> input -> output) -> output -> Unfold input -> output
-foldl' step init (Unfold run) = run step init
+instance Foldable Unfold where
+  {-# INLINE foldMap #-}
+  foldMap inputMonoid = foldl' step mempty where
+    step monoid input = mappend monoid (inputMonoid input)
+  foldl = foldl'
+  {-# INLINE foldl' #-}
+  foldl' step init (Unfold run) = run step init
+
 
 {-| Apply a Gonzalez fold -}
 {-# INLINE fold #-}
