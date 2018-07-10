@@ -1,7 +1,7 @@
 module DeferredFolds.UnfoldM
 where
 
-import DeferredFolds.Prelude hiding (foldl')
+import DeferredFolds.Prelude
 import qualified DeferredFolds.Prelude as A
 
 
@@ -47,13 +47,16 @@ instance Monad m => Monoid (UnfoldM m a) where
   mempty = empty
   mappend = (<>)
 
-{-| Perform a strict left fold -}
-{-# INLINE foldl' #-}
-foldl' :: (output -> input -> output) -> output -> UnfoldM Identity input -> output
-foldl' step init (UnfoldM run) =
-  runIdentity (run identityStep init)
-  where
-    identityStep state input = return (step state input)
+instance Foldable (UnfoldM Identity) where
+  {-# INLINE foldMap #-}
+  foldMap inputMonoid = foldl' step mempty where
+    step monoid input = mappend monoid (inputMonoid input)
+  foldl = foldl'
+  {-# INLINE foldl' #-}
+  foldl' step init (UnfoldM run) =
+    runIdentity (run identityStep init)
+    where
+      identityStep state input = return (step state input)
 
 {-| Perform a monadic strict left fold -}
 {-# INLINE foldlM' #-}
