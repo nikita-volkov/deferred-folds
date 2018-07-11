@@ -3,6 +3,7 @@ where
 
 import DeferredFolds.Prelude
 import qualified DeferredFolds.Prelude as A
+import qualified DeferredFolds.UnfoldM as B
 import qualified Data.Map.Strict as C
 import qualified Data.IntMap.Strict as D
 
@@ -111,6 +112,11 @@ instance Foldable Unfold where
 {-# INLINE fold #-}
 fold :: Fold input output -> Unfold input -> output
 fold (Fold step init extract) (Unfold run) = extract (run step init)
+
+{-| Unlift a monadic unfold -}
+{-# INLINE unfoldM #-}
+unfoldM :: B.UnfoldM Identity input -> Unfold input
+unfoldM (B.UnfoldM runFoldM) = Unfold (\ step init -> runIdentity (runFoldM (\ a b -> return (step a b)) init))
 
 {-| Construct from any foldable -}
 {-# INLINE foldable #-}
