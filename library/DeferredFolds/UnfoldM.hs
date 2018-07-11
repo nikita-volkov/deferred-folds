@@ -64,6 +64,10 @@ foldlM' :: Monad m => (output -> input -> m output) -> output -> UnfoldM m input
 foldlM' step init (UnfoldM run) =
   run step init
 
+{-# INLINE forM_ #-}
+forM_ :: Monad m => (input -> m ()) -> UnfoldM m input -> m ()
+forM_ step = foldlM' (const step) ()
+
 {-| Apply a Gonzalez fold -}
 {-# INLINE fold #-}
 fold :: Fold input output -> UnfoldM Identity input -> output
