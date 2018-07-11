@@ -1,7 +1,7 @@
 module DeferredFolds.UnfoldM
 where
 
-import DeferredFolds.Prelude
+import DeferredFolds.Prelude hiding (mapM_)
 import qualified DeferredFolds.Prelude as A
 
 
@@ -64,9 +64,13 @@ foldlM' :: Monad m => (output -> input -> m output) -> output -> UnfoldM m input
 foldlM' step init (UnfoldM run) =
   run step init
 
+{-# INLINE mapM_ #-}
+mapM_ :: Monad m => (input -> m ()) -> UnfoldM m input -> m ()
+mapM_ step = foldlM' (const step) ()
+
 {-# INLINE forM_ #-}
-forM_ :: Monad m => (input -> m ()) -> UnfoldM m input -> m ()
-forM_ step = foldlM' (const step) ()
+forM_ :: Monad m => UnfoldM m input -> (input -> m ()) -> m ()
+forM_ = flip mapM_
 
 {-| Apply a Gonzalez fold -}
 {-# INLINE fold #-}
