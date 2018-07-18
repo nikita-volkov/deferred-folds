@@ -9,6 +9,7 @@ where
 -------------------------
 import Prelude as Exports hiding ((<>))
 import Foreign as Exports hiding (void)
+import Data.Bool as Exports
 import Data.Monoid as Exports hiding ((<>), First(..), Last(..))
 import Data.Semigroup as Exports
 import Data.Foldable as Exports

@@ -91,6 +91,10 @@ foldM (FoldM step init extract) view =
 foldable :: (Monad m, Foldable foldable) => foldable a -> UnfoldM m a
 foldable foldable = UnfoldM (\ step init -> A.foldlM step init foldable)
 
+{-# INLINE filter #-}
+filter :: Monad m => (a -> m Bool) -> UnfoldM m a -> UnfoldM m a
+filter test (UnfoldM run) = UnfoldM (\ step -> run (\ state element -> test element >>= bool (return state) (step state element)))
+
 {-| Ints in the specified inclusive range -}
 intsInRange :: Monad m => Int -> Int -> UnfoldM m Int
 intsInRange from to =

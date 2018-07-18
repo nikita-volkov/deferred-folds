@@ -123,6 +123,10 @@ unfoldM (B.UnfoldM runFoldM) = Unfold (\ step init -> runIdentity (runFoldM (\ a
 foldable :: Foldable foldable => foldable a -> Unfold a
 foldable foldable = Unfold (\ step init -> A.foldl' step init foldable)
 
+{-# INLINE filter #-}
+filter :: (a -> Bool) -> Unfold a -> Unfold a
+filter test (Unfold run) = Unfold (\ step -> run (\ state element -> if test element then step state element else state))
+
 {-| Ints in the specified inclusive range -}
 {-# INLINE intsInRange #-}
 intsInRange :: Int -> Int -> Unfold Int
