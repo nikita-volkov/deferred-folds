@@ -112,3 +112,10 @@ intsInRange from to =
           loop newState (succ int)
         else return state
     in loop init from
+
+{-| TVar contents -}
+{-# INLINE tVarValue #-}
+tVarValue :: TVar a -> UnfoldM STM a
+tVarValue var = UnfoldM $ \ step state -> do
+  a <- readTVar var
+  step state a
