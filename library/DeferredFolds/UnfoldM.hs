@@ -65,10 +65,12 @@ foldlM' :: Monad m => (output -> input -> m output) -> output -> UnfoldM m input
 foldlM' step init (UnfoldM run) =
   run step init
 
+{-| A more efficient implementation of mapM_ -}
 {-# INLINE mapM_ #-}
 mapM_ :: Monad m => (input -> m ()) -> UnfoldM m input -> m ()
 mapM_ step = foldlM' (const step) ()
 
+{-| Same as 'mapM_' with arguments flipped -}
 {-# INLINE forM_ #-}
 forM_ :: Monad m => UnfoldM m input -> (input -> m ()) -> m ()
 forM_ = flip mapM_
@@ -92,6 +94,7 @@ foldM (FoldM step init extract) view =
 foldable :: (Monad m, Foldable foldable) => foldable a -> UnfoldM m a
 foldable foldable = UnfoldM (\ step init -> A.foldlM step init foldable)
 
+{-| Filter -}
 {-# INLINE filter #-}
 filter :: Monad m => (a -> m Bool) -> UnfoldM m a -> UnfoldM m a
 filter test (UnfoldM run) = UnfoldM (\ step -> run (\ state element -> test element >>= bool (return state) (step state element)))
