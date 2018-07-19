@@ -27,6 +27,7 @@ instance Monad m => Alternative (UnfoldM m) where
 
 instance Monad m => Monad (UnfoldM m) where
   return = pure
+  {-# INLINE (>>=) #-}
   (>>=) (UnfoldM left) rightK =
     UnfoldM $ \ step init ->
     let
@@ -96,6 +97,7 @@ filter :: Monad m => (a -> m Bool) -> UnfoldM m a -> UnfoldM m a
 filter test (UnfoldM run) = UnfoldM (\ step -> run (\ state element -> test element >>= bool (return state) (step state element)))
 
 {-| Ints in the specified inclusive range -}
+{-# INLINE intsInRange #-}
 intsInRange :: Monad m => Int -> Int -> UnfoldM m Int
 intsInRange from to =
   UnfoldM $ \ step init ->
