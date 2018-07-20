@@ -94,6 +94,16 @@ foldM (FoldM step init extract) view =
 foldable :: (Monad m, Foldable foldable) => foldable a -> UnfoldM m a
 foldable foldable = UnfoldM (\ step init -> A.foldlM step init foldable)
 
+{-| Construct from a specification of how to execute a left-fold -}
+{-# INLINE foldlRunner #-}
+foldlRunner :: Monad m => (forall x. (x -> a -> x) -> x -> x) -> UnfoldM m a
+foldlRunner run = UnfoldM (\ stepM state -> run (\ stateM a -> stateM >>= \state -> stepM state a) (return state))
+
+{-| Construct from a specification of how to execute a right-fold -}
+{-# INLINE foldrRunner #-}
+foldrRunner :: Monad m => (forall x. (a -> x -> x) -> x -> x) -> UnfoldM m a
+foldrRunner run = UnfoldM (\ stepM -> run (\ x k z -> stepM z x >>= k) return)
+
 {-| Filter -}
 {-# INLINE filter #-}
 filter :: Monad m => (a -> m Bool) -> UnfoldM m a -> UnfoldM m a
