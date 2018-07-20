@@ -3,6 +3,7 @@ where
 
 import DeferredFolds.Prelude hiding (mapM_)
 import qualified DeferredFolds.Prelude as A
+import qualified DeferredFolds.Unfoldr as B
 
 
 {-|
@@ -103,6 +104,9 @@ foldlRunner run = UnfoldM (\ stepM state -> run (\ stateM a -> stateM >>= \state
 {-# INLINE foldrRunner #-}
 foldrRunner :: Monad m => (forall x. (a -> x -> x) -> x -> x) -> UnfoldM m a
 foldrRunner run = UnfoldM (\ stepM -> run (\ x k z -> stepM z x >>= k) return)
+
+unfoldr :: Monad m => B.Unfoldr a -> UnfoldM m a
+unfoldr (B.Unfoldr unfoldr) = foldrRunner unfoldr
 
 {-| Filter -}
 {-# INLINE filter #-}

@@ -41,6 +41,7 @@ library
   exposed-modules:
     DeferredFolds.Unfold
     DeferredFolds.UnfoldM
+    DeferredFolds.Unfoldr
   other-modules:
     DeferredFolds.Prelude
   build-depends:
