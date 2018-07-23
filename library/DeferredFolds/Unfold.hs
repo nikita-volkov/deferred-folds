@@ -110,6 +110,9 @@ instance Foldable Unfold where
 instance Eq a => Eq (Unfold a) where
   (==) left right = toList left == toList right
 
+instance Show a => Show (Unfold a) where
+  show = show . toList
+
 {-| Apply a Gonzalez fold -}
 {-# INLINE fold #-}
 fold :: Fold input output -> Unfold input -> output
