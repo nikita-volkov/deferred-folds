@@ -59,6 +59,9 @@ instance Foldable (UnfoldM Identity) where
     where
       identityStep state input = return (step state input)
 
+instance Eq a => Eq (UnfoldM Identity a) where
+  (==) left right = toList left == toList right
+
 {-| Perform a monadic strict left fold -}
 {-# INLINE foldlM' #-}
 foldlM' :: Monad m => (output -> input -> m output) -> output -> UnfoldM m input -> m output
