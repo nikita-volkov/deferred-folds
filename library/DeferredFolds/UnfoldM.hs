@@ -68,6 +68,10 @@ instance Eq a => Eq (UnfoldM Identity a) where
 instance Show a => Show (UnfoldM Identity a) where
   show = show . toList
 
+{-# INLINE null #-}
+null :: Monad m => UnfoldM m input -> m Bool
+null (UnfoldM run) = run (\ _ _ -> return False) True
+
 {-| Perform a monadic strict left fold -}
 {-# INLINE foldlM' #-}
 foldlM' :: Monad m => (output -> input -> m output) -> output -> UnfoldM m input -> m output
