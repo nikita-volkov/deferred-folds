@@ -68,6 +68,7 @@ instance Eq a => Eq (UnfoldM Identity a) where
 instance Show a => Show (UnfoldM Identity a) where
   show = show . toList
 
+{-| Check whether it's empty -}
 {-# INLINE null #-}
 null :: Monad m => UnfoldM m input -> m Bool
 null (UnfoldM run) = run (\ _ _ -> return False) True
