@@ -41,6 +41,9 @@ instance Monad m => MonadPlus (UnfoldM m) where
   mzero = empty
   mplus = (<|>)
 
+instance MonadTrans UnfoldM where
+  lift m = UnfoldM (\ step init -> m >>= step init)
+
 instance Monad m => Semigroup (UnfoldM m a) where
   (<>) = (<|>)
 

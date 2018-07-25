@@ -82,3 +82,7 @@ import Data.Sequence as Exports (Seq)
 -- foldl
 -------------------------
 import Control.Foldl as Exports (Fold(..), FoldM(..))
+
+-- transformers
+-------------------------
+import Control.Monad.Trans.Class as Exports
