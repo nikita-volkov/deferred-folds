@@ -107,6 +107,11 @@ instance Foldable Unfold where
   {-# INLINE foldl' #-}
   foldl' step init (Unfold run) = run step init
 
+instance Eq a => Eq (Unfold a) where
+  (==) left right = toList left == toList right
+
+instance Show a => Show (Unfold a) where
+  show = show . toList
 
 {-| Apply a Gonzalez fold -}
 {-# INLINE fold #-}

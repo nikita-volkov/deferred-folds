@@ -42,6 +42,9 @@ instance Monad m => MonadPlus (UnfoldM m) where
   mzero = empty
   mplus = (<|>)
 
+instance MonadTrans UnfoldM where
+  lift m = UnfoldM (\ step init -> m >>= step init)
+
 instance Monad m => Semigroup (UnfoldM m a) where
   (<>) = (<|>)
 
@@ -59,6 +62,17 @@ instance Foldable (UnfoldM Identity) where
     runIdentity (run identityStep init)
     where
       identityStep state input = return (step state input)
+
+instance Eq a => Eq (UnfoldM Identity a) where
+  (==) left right = toList left == toList right
+
+instance Show a => Show (UnfoldM Identity a) where
+  show = show . toList
+
+{-| Check whether it's empty -}
+{-# INLINE null #-}
+null :: Monad m => UnfoldM m input -> m Bool
+null (UnfoldM run) = run (\ _ _ -> return False) True
 
 {-| Perform a monadic strict left fold -}
 {-# INLINE foldlM' #-}
@@ -133,3 +147,9 @@ tVarValue :: TVar a -> UnfoldM STM a
 tVarValue var = UnfoldM $ \ step state -> do
   a <- readTVar var
   step state a
+
+{-| Change the base monad using invariant natural transformations -}
+{-# INLINE hoist #-}
+hoist :: (forall a. m a -> n a) -> (forall a. n a -> m a) -> UnfoldM m a -> UnfoldM n a
+hoist trans1 trans2 (UnfoldM unfold) = UnfoldM $ \ step init -> 
+  trans1 (unfold (\ a b -> trans2 (step a b)) init)

@@ -1,7 +1,7 @@
 name:
   deferred-folds
 version:
-  0.6.3
+  0.6.8
 category:
   Folding
 synopsis:
@@ -47,4 +47,5 @@ library
   build-depends:
     base >=4.7 && <5,
     containers >=0.5 && <0.6,
-    foldl >=1 && <2
+    foldl >=1 && <2,
+    transformers >=0.5 && <0.6
