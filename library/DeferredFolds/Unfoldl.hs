@@ -1,9 +1,9 @@
-module DeferredFolds.Unfold
+module DeferredFolds.Unfoldl
 where
 
 import DeferredFolds.Prelude
 import qualified DeferredFolds.Prelude as A
-import qualified DeferredFolds.UnfoldM as B
+import qualified DeferredFolds.UnfoldlM as B
 import qualified Data.Map.Strict as C
 import qualified Data.IntMap.Strict as D
 
@@ -33,21 +33,21 @@ Which in Haskell is essentially the same as
 
 We can isolate that part into an abstraction:
 
->newtype Unfold a = Unfold (forall b. (b -> a -> b) -> b -> b)
+>newtype Unfoldl a = Unfoldl (forall b. (b -> a -> b) -> b -> b)
 
 Then we get to this simple morphism:
 
->list :: [a] -> Unfold a
->list list = Unfold (\ step init -> foldl' step init list)
+>list :: [a] -> Unfoldl a
+>list list = Unfoldl (\ step init -> foldl' step init list)
 
 We can do the same with say "Data.Text.Text":
 
->text :: Text -> Unfold Char
->text text = Unfold (\ step init -> Data.Text.foldl' step init text)
+>text :: Text -> Unfoldl Char
+>text text = Unfoldl (\ step init -> Data.Text.foldl' step init text)
 
 And then we can use those both to concatenate with just an @O(1)@ cost:
 
->abcdef :: Unfold Char
+>abcdef :: Unfoldl Char
 >abcdef = list ['a', 'b', 'c'] <> text "def"
 
 Please notice that up until this moment no actual data materialization has happened and
@@ -60,83 +60,83 @@ E.g., using the "fold" function:
 >abcdefLength :: Int
 >abcdefLength = fold Control.Foldl.length abcdef
 -}
-newtype Unfold input =
-  Unfold (forall output. (output -> input -> output) -> output -> output)
+newtype Unfoldl input =
+  Unfoldl (forall output. (output -> input -> output) -> output -> output)
 
-deriving instance Functor Unfold
+deriving instance Functor Unfoldl
 
-instance Applicative Unfold where
+instance Applicative Unfoldl where
   pure x =
-    Unfold (\ step init -> step init x)
+    Unfoldl (\ step init -> step init x)
   (<*>) = ap
 
-instance Alternative Unfold where
+instance Alternative Unfoldl where
   empty =
-    Unfold (const id)
+    Unfoldl (const id)
   {-# INLINE (<|>) #-}
-  (<|>) (Unfold left) (Unfold right) =
-    Unfold (\ step init -> right step (left step init))
+  (<|>) (Unfoldl left) (Unfoldl right) =
+    Unfoldl (\ step init -> right step (left step init))
 
-instance Monad Unfold where
+instance Monad Unfoldl where
   return = pure
-  (>>=) (Unfold left) rightK =
-    Unfold $ \ step init ->
+  (>>=) (Unfoldl left) rightK =
+    Unfoldl $ \ step init ->
     let
       newStep output x =
         case rightK x of
-          Unfold right ->
+          Unfoldl right ->
             right step output
       in left newStep init
 
-instance MonadPlus Unfold where
+instance MonadPlus Unfoldl where
   mzero = empty
   mplus = (<|>)
 
-instance Semigroup (Unfold a) where
+instance Semigroup (Unfoldl a) where
   (<>) = (<|>)
 
-instance Monoid (Unfold a) where
+instance Monoid (Unfoldl a) where
   mempty = empty
   mappend = (<>)
 
-instance Foldable Unfold where
+instance Foldable Unfoldl where
   {-# INLINE foldMap #-}
   foldMap inputMonoid = foldl' step mempty where
     step monoid input = mappend monoid (inputMonoid input)
   foldl = foldl'
   {-# INLINE foldl' #-}
-  foldl' step init (Unfold run) = run step init
+  foldl' step init (Unfoldl run) = run step init
 
-instance Eq a => Eq (Unfold a) where
+instance Eq a => Eq (Unfoldl a) where
   (==) left right = toList left == toList right
 
-instance Show a => Show (Unfold a) where
+instance Show a => Show (Unfoldl a) where
   show = show . toList
 
 {-| Apply a Gonzalez fold -}
 {-# INLINE fold #-}
-fold :: Fold input output -> Unfold input -> output
-fold (Fold step init extract) (Unfold run) = extract (run step init)
+fold :: Fold input output -> Unfoldl input -> output
+fold (Fold step init extract) (Unfoldl run) = extract (run step init)
 
 {-| Unlift a monadic unfold -}
 {-# INLINE unfoldM #-}
-unfoldM :: B.UnfoldM Identity input -> Unfold input
-unfoldM (B.UnfoldM runFoldM) = Unfold (\ step init -> runIdentity (runFoldM (\ a b -> return (step a b)) init))
+unfoldM :: B.UnfoldlM Identity input -> Unfoldl input
+unfoldM (B.UnfoldlM runFoldM) = Unfoldl (\ step init -> runIdentity (runFoldM (\ a b -> return (step a b)) init))
 
 {-| Construct from any foldable -}
 {-# INLINE foldable #-}
-foldable :: Foldable foldable => foldable a -> Unfold a
-foldable foldable = Unfold (\ step init -> A.foldl' step init foldable)
+foldable :: Foldable foldable => foldable a -> Unfoldl a
+foldable foldable = Unfoldl (\ step init -> A.foldl' step init foldable)
 
 {-# INLINE filter #-}
-filter :: (a -> Bool) -> Unfold a -> Unfold a
-filter test (Unfold run) = Unfold (\ step -> run (\ state element -> if test element then step state element else state))
+filter :: (a -> Bool) -> Unfoldl a -> Unfoldl a
+filter test (Unfoldl run) = Unfoldl (\ step -> run (\ state element -> if test element then step state element else state))
 
 {-| Ints in the specified inclusive range -}
 {-# INLINE intsInRange #-}
-intsInRange :: Int -> Int -> Unfold Int
+intsInRange :: Int -> Int -> Unfoldl Int
 intsInRange from to =
-  Unfold $ \ step init ->
+  Unfoldl $ \ step init ->
   let
     loop !state int =
       if int <= to
@@ -145,11 +145,11 @@ intsInRange from to =
     in loop init from
 
 {-# INLINE map #-}
-map :: Map key value -> Unfold (key, value)
+map :: Map key value -> Unfoldl (key, value)
 map map =
-  Unfold (\ step init -> C.foldlWithKey' (\ state key value -> step state (key, value)) init map)
+  Unfoldl (\ step init -> C.foldlWithKey' (\ state key value -> step state (key, value)) init map)
 
 {-# INLINE intMap #-}
-intMap :: IntMap value -> Unfold (Int, value)
+intMap :: IntMap value -> Unfoldl (Int, value)
 intMap intMap =
-  Unfold (\ step init -> D.foldlWithKey' (\ state key value -> step state (key, value)) init intMap)
+  Unfoldl (\ step init -> D.foldlWithKey' (\ state key value -> step state (key, value)) init intMap)
