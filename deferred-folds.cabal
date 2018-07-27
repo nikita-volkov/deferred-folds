@@ -42,6 +42,7 @@ library
     DeferredFolds.Unfoldl
     DeferredFolds.UnfoldlM
     DeferredFolds.Unfoldr
+    DeferredFolds.UnfoldrM
   other-modules:
     DeferredFolds.Prelude
   build-depends:
