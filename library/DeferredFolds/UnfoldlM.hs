@@ -2,15 +2,9 @@ module DeferredFolds.UnfoldlM
 where
 
 import DeferredFolds.Prelude hiding (mapM_)
+import DeferredFolds.Types
 import qualified DeferredFolds.Prelude as A
-import qualified DeferredFolds.Unfoldr as B
 
-
-{-|
-A monadic variation of "DeferredFolds.Unfoldl"
--}
-newtype UnfoldlM m input =
-  UnfoldlM (forall output. (output -> input -> m output) -> output -> m output)
 
 deriving instance Functor m => Functor (UnfoldlM m)
 
@@ -119,8 +113,8 @@ foldlRunner run = UnfoldlM (\ stepM state -> run (\ stateM a -> stateM >>= \stat
 foldrRunner :: Monad m => (forall x. (a -> x -> x) -> x -> x) -> UnfoldlM m a
 foldrRunner run = UnfoldlM (\ stepM -> run (\ x k z -> stepM z x >>= k) return)
 
-unfoldr :: Monad m => B.Unfoldr a -> UnfoldlM m a
-unfoldr (B.Unfoldr unfoldr) = foldrRunner unfoldr
+unfoldr :: Monad m => Unfoldr a -> UnfoldlM m a
+unfoldr (Unfoldr unfoldr) = foldrRunner unfoldr
 
 {-| Filter -}
 {-# INLINE filter #-}

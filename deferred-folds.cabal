@@ -44,6 +44,7 @@ library
     DeferredFolds.Unfoldr
     DeferredFolds.UnfoldrM
   other-modules:
+    DeferredFolds.Types
     DeferredFolds.Prelude
   build-depends:
     base >=4.7 && <5,
