@@ -7,6 +7,7 @@ import qualified DeferredFolds.UnfoldM as B
 import qualified Data.Map.Strict as C
 import qualified Data.IntMap.Strict as D
 import qualified Data.ByteString as ByteString
+import qualified Data.ByteString.Short.Internal as ShortByteString
 
 
 {-|
@@ -158,3 +159,11 @@ intMap intMap =
 {-# INLINE byteStringBytes #-}
 byteStringBytes :: ByteString -> Unfold Word8
 byteStringBytes bs = Unfold (\ step init -> ByteString.foldl' step init bs)
+
+{-# INLINE shortByteStringBytes #-}
+shortByteStringBytes :: ShortByteString -> Unfold Word8
+shortByteStringBytes (ShortByteString.SBS ba#) = primArray (PrimArray ba#)
+
+{-# INLINE primArray #-}
+primArray :: (Prim prim) => PrimArray prim -> Unfold prim
+primArray ba = Unfold $ \f z -> foldlPrimArray' f z ba

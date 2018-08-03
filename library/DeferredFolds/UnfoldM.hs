@@ -3,8 +3,8 @@ where
 
 import DeferredFolds.Prelude hiding (mapM_)
 import qualified DeferredFolds.Prelude as A
-import qualified Data.ByteString as ByteString
 import qualified Data.ByteString.Internal as ByteString
+import qualified Data.ByteString.Short.Internal as ShortByteString
 
 
 {-|
@@ -152,7 +152,7 @@ hoist :: (forall a. m a -> n a) -> (forall a. n a -> m a) -> UnfoldM m a -> Unfo
 hoist trans1 trans2 (UnfoldM unfold) = UnfoldM $ \ step init -> 
   trans1 (unfold (\ a b -> trans2 (step a b)) init)
 
-{-# INLINE byteStringBytes #-}
+{-# INLINABLE byteStringBytes #-}
 byteStringBytes :: ByteString -> UnfoldM IO Word8
 byteStringBytes (ByteString.PS fp off len) =
   UnfoldM $ \ step init ->
@@ -166,3 +166,11 @@ byteStringBytes (ByteString.PS fp off len) =
         newState <- step state x
         iterate newState (plusPtr ptr 1)
     in iterate init (plusPtr ptr off)
+
+{-# INLINE shortByteStringBytes #-}
+shortByteStringBytes :: Monad m => ShortByteString -> UnfoldM m Word8
+shortByteStringBytes (ShortByteString.SBS ba#) = primArray (PrimArray ba#)
+
+{-# INLINE primArray #-}
+primArray :: (Monad m, Prim prim) => PrimArray prim -> UnfoldM m prim
+primArray ba = UnfoldM $ \f z -> foldlPrimArrayM' f z ba
