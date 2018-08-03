@@ -6,6 +6,7 @@ import qualified DeferredFolds.Prelude as A
 import qualified DeferredFolds.UnfoldM as B
 import qualified Data.Map.Strict as C
 import qualified Data.IntMap.Strict as D
+import qualified Data.ByteString as ByteString
 
 
 {-|
@@ -153,3 +154,7 @@ map map =
 intMap :: IntMap value -> Unfold (Int, value)
 intMap intMap =
   Unfold (\ step init -> D.foldlWithKey' (\ state key value -> step state (key, value)) init intMap)
+
+{-# INLINE byteStringBytes #-}
+byteStringBytes :: ByteString -> Unfold Word8
+byteStringBytes bs = Unfold (\ step init -> ByteString.foldl' step init bs)

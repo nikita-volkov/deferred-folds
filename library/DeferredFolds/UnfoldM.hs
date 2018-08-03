@@ -3,6 +3,8 @@ where
 
 import DeferredFolds.Prelude hiding (mapM_)
 import qualified DeferredFolds.Prelude as A
+import qualified Data.ByteString as ByteString
+import qualified Data.ByteString.Internal as ByteString
 
 
 {-|
@@ -149,3 +151,18 @@ tVarValue var = UnfoldM $ \ step state -> do
 hoist :: (forall a. m a -> n a) -> (forall a. n a -> m a) -> UnfoldM m a -> UnfoldM n a
 hoist trans1 trans2 (UnfoldM unfold) = UnfoldM $ \ step init -> 
   trans1 (unfold (\ a b -> trans2 (step a b)) init)
+
+{-# INLINE byteStringBytes #-}
+byteStringBytes :: ByteString -> UnfoldM IO Word8
+byteStringBytes (ByteString.PS fp off len) =
+  UnfoldM $ \ step init ->
+  withForeignPtr fp $ \ ptr ->
+  let
+    endPtr = plusPtr ptr (off + len)
+    iterate !state !ptr = if ptr == endPtr
+      then return state
+      else do
+        x <- peek ptr
+        newState <- step state x
+        iterate newState (plusPtr ptr 1)
+    in iterate init (plusPtr ptr off)
