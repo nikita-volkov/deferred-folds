@@ -130,6 +130,7 @@ unfoldM (B.UnfoldM runFoldM) = Unfold (\ step init -> runIdentity (runFoldM (\ a
 foldable :: Foldable foldable => foldable a -> Unfold a
 foldable foldable = Unfold (\ step init -> A.foldl' step init foldable)
 
+{-| Filter the values given a predicate -}
 {-# INLINE filter #-}
 filter :: (a -> Bool) -> Unfold a -> Unfold a
 filter test (Unfold run) = Unfold (\ step -> run (\ state element -> if test element then step state element else state))

@@ -120,7 +120,7 @@ foldlRunner run = UnfoldM (\ stepM state -> run (\ stateM a -> stateM >>= \state
 foldrRunner :: Monad m => (forall x. (a -> x -> x) -> x -> x) -> UnfoldM m a
 foldrRunner run = UnfoldM (\ stepM -> run (\ x k z -> stepM z x >>= k) return)
 
-{-| Filter -}
+{-| Filter the values given a predicate -}
 {-# INLINE filter #-}
 filter :: Monad m => (a -> m Bool) -> UnfoldM m a -> UnfoldM m a
 filter test (UnfoldM run) = UnfoldM (\ step -> run (\ state element -> test element >>= bool (return state) (step state element)))
