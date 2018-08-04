@@ -1,7 +1,7 @@
 module DeferredFolds.UnfoldM
 where
 
-import DeferredFolds.Prelude hiding (mapM_)
+import DeferredFolds.Prelude hiding (mapM_, foldM)
 import qualified DeferredFolds.Prelude as A
 import qualified Data.ByteString.Internal as ByteString
 import qualified Data.ByteString.Short.Internal as ShortByteString
@@ -104,6 +104,11 @@ foldM (FoldM step init extract) view =
     initialState <- init
     finalState <- foldlM' step initialState view
     extract finalState
+
+{-| Lift a fold input mapping function into a mapping of unfolds -}
+{-# INLINE mapFoldMInput #-}
+mapFoldMInput :: Monad m => (forall x. FoldM m b x -> FoldM m a x) -> UnfoldM m a -> UnfoldM m b
+mapFoldMInput newFoldM unfoldM = UnfoldM $ \ step init -> foldM (newFoldM (FoldM step (return init) return)) unfoldM
 
 {-| Construct from any foldable -}
 {-# INLINE foldable #-}

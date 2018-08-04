@@ -1,7 +1,7 @@
 module DeferredFolds.Unfold
 where
 
-import DeferredFolds.Prelude
+import DeferredFolds.Prelude hiding (fold)
 import qualified DeferredFolds.Prelude as A
 import qualified DeferredFolds.UnfoldM as B
 import qualified Data.Map.Strict as C
@@ -124,6 +124,11 @@ fold (Fold step init extract) (Unfold run) = extract (run step init)
 {-# INLINE unfoldM #-}
 unfoldM :: B.UnfoldM Identity input -> Unfold input
 unfoldM (B.UnfoldM runFoldM) = Unfold (\ step init -> runIdentity (runFoldM (\ a b -> return (step a b)) init))
+
+{-| Lift a fold input mapping function into a mapping of unfolds -}
+{-# INLINE mapFoldInput #-}
+mapFoldInput :: (forall x. Fold b x -> Fold a x) -> Unfold a -> Unfold b
+mapFoldInput newFold unfold = Unfold $ \ step init -> fold (newFold (Fold step init id)) unfold
 
 {-| Construct from any foldable -}
 {-# INLINE foldable #-}
