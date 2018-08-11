@@ -178,4 +178,4 @@ shortByteStringBytes (ShortByteString.SBS ba#) = primArray (PrimArray ba#)
 
 {-# INLINE primArray #-}
 primArray :: (Monad m, Prim prim) => PrimArray prim -> UnfoldM m prim
-primArray ba = UnfoldM $ \f z -> foldlPrimArrayM' f z ba
+primArray pa = UnfoldM $ \ f z -> foldlPrimArrayM' f z pa
