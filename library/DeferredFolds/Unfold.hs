@@ -152,28 +152,34 @@ intsInRange from to =
         else state
     in loop init from
 
+{-| Associations of a map -}
 {-# INLINE map #-}
 map :: Map key value -> Unfold (key, value)
 map map =
   Unfold (\ step init -> C.foldlWithKey' (\ state key value -> step state (key, value)) init map)
 
+{-| Associations of an intmap -}
 {-# INLINE intMap #-}
 intMap :: IntMap value -> Unfold (Int, value)
 intMap intMap =
   Unfold (\ step init -> D.foldlWithKey' (\ state key value -> step state (key, value)) init intMap)
 
+{-| Bytes of a bytestring -}
 {-# INLINE byteStringBytes #-}
 byteStringBytes :: ByteString -> Unfold Word8
 byteStringBytes bs = Unfold (\ step init -> ByteString.foldl' step init bs)
 
+{-| Bytes of a short bytestring -}
 {-# INLINE shortByteStringBytes #-}
 shortByteStringBytes :: ShortByteString -> Unfold Word8
 shortByteStringBytes (ShortByteString.SBS ba#) = primArray (PrimArray ba#)
 
+{-| Elements of a prim array -}
 {-# INLINE primArray #-}
 primArray :: (Prim prim) => PrimArray prim -> Unfold prim
 primArray ba = Unfold $ \ f z -> foldlPrimArray' f z ba
 
+{-| Elements of a prim array coming paired with indices -}
 {-# INLINE primArrayWithIndices #-}
 primArrayWithIndices :: (Prim prim) => PrimArray prim -> Unfold (Int, prim)
 primArrayWithIndices pa = Unfold $ \ step state -> let

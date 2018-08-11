@@ -157,6 +157,7 @@ hoist :: (forall a. m a -> n a) -> (forall a. n a -> m a) -> UnfoldM m a -> Unfo
 hoist trans1 trans2 (UnfoldM unfold) = UnfoldM $ \ step init -> 
   trans1 (unfold (\ a b -> trans2 (step a b)) init)
 
+{-| Bytes of a bytestring -}
 {-# INLINABLE byteStringBytes #-}
 byteStringBytes :: ByteString -> UnfoldM IO Word8
 byteStringBytes (ByteString.PS fp off len) =
@@ -172,14 +173,17 @@ byteStringBytes (ByteString.PS fp off len) =
         iterate newState (plusPtr ptr 1)
     in iterate init (plusPtr ptr off)
 
+{-| Bytes of a short bytestring -}
 {-# INLINE shortByteStringBytes #-}
 shortByteStringBytes :: Monad m => ShortByteString -> UnfoldM m Word8
 shortByteStringBytes (ShortByteString.SBS ba#) = primArray (PrimArray ba#)
 
+{-| Elements of a prim array -}
 {-# INLINE primArray #-}
 primArray :: (Monad m, Prim prim) => PrimArray prim -> UnfoldM m prim
 primArray pa = UnfoldM $ \ f z -> foldlPrimArrayM' f z pa
 
+{-| Elements of a prim array coming paired with indices -}
 {-# INLINE primArrayWithIndices #-}
 primArrayWithIndices :: (Monad m, Prim prim) => PrimArray prim -> UnfoldM m (Int, prim)
 primArrayWithIndices pa = UnfoldM $ \ step state -> let
