@@ -173,3 +173,12 @@ shortByteStringBytes (ShortByteString.SBS ba#) = primArray (PrimArray ba#)
 {-# INLINE primArray #-}
 primArray :: (Prim prim) => PrimArray prim -> Unfold prim
 primArray ba = Unfold $ \ f z -> foldlPrimArray' f z ba
+
+{-# INLINE primArrayWithIndices #-}
+primArrayWithIndices :: (Prim prim) => PrimArray prim -> Unfold (Int, prim)
+primArrayWithIndices pa = Unfold $ \ step state -> let
+  !size = sizeofPrimArray pa
+  iterate index !state = if index < size
+    then iterate (succ index) (step state (index, indexPrimArray pa index))
+    else state
+  in iterate 0 state
