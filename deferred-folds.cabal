@@ -1,5 +1,5 @@
 name: deferred-folds
-version: 0.6.12
+version: 0.7
 category: Folding
 synopsis: Abstractions over deferred folds
 description:
