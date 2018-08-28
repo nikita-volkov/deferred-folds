@@ -73,6 +73,7 @@ foldable foldable = Unfoldr (\ step init -> foldr step init foldable)
 filter :: (a -> Bool) -> Unfoldr a -> Unfoldr a
 filter test (Unfoldr run) = Unfoldr (\ step -> run (\ element state -> if test element then step element state else state))
 
+{-| Ascending infinite stream of ints starting from the one specified -}
 {-# INLINE intsFrom #-}
 intsFrom :: Int -> Unfoldr Int
 intsFrom from = Unfoldr $ \ step init -> let
