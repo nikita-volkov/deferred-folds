@@ -1,11 +1,8 @@
 module DeferredFolds.UnfoldrM
+(
+  module Exports,
+)
 where
 
-import DeferredFolds.Prelude
-import DeferredFolds.Types
-
-
-unfoldr :: Monad m => Unfoldr a -> UnfoldrM m a
-unfoldr (Unfoldr unfoldr) = UnfoldrM $ \ stepM -> let
-  step input act state = stepM input state >>= act
-  in unfoldr step return
+import DeferredFolds.Types as Exports (UnfoldrM(..))
+import DeferredFolds.Defs.UnfoldrM as Exports

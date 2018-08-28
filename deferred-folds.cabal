@@ -27,6 +27,10 @@ library
     DeferredFolds.UnfoldrM
   other-modules:
     DeferredFolds.Types
+    DeferredFolds.Defs.Unfoldl
+    DeferredFolds.Defs.UnfoldlM
+    DeferredFolds.Defs.Unfoldr
+    DeferredFolds.Defs.UnfoldrM
     DeferredFolds.Prelude
   build-depends:
     base >=4.7 && <5,
