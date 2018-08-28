@@ -28,9 +28,9 @@ library
     DeferredFolds.Unfoldl
     DeferredFolds.UnfoldlM
     DeferredFolds.Unfoldr
-    DeferredFolds.UnfoldrM
   other-modules:
     DeferredFolds.Types
+    DeferredFolds.UnfoldrM
     DeferredFolds.Defs.Unfoldl
     DeferredFolds.Defs.UnfoldlM
     DeferredFolds.Defs.Unfoldr
