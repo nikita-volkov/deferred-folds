@@ -86,3 +86,12 @@ import Control.Foldl as Exports (Fold(..), FoldM(..))
 -- transformers
 -------------------------
 import Control.Monad.Trans.Class as Exports
+
+-- bytestring
+-------------------------
+import Data.ByteString as Exports (ByteString)
+import Data.ByteString.Short as Exports (ShortByteString)
+
+-- primitive
+-------------------------
+import Data.Primitive as Exports

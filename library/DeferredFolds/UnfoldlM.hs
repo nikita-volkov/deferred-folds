@@ -1,9 +1,11 @@
 module DeferredFolds.UnfoldlM
 where
 
-import DeferredFolds.Prelude hiding (mapM_)
+import DeferredFolds.Prelude hiding (mapM_, foldM)
 import DeferredFolds.Types
 import qualified DeferredFolds.Prelude as A
+import qualified Data.ByteString.Internal as ByteString
+import qualified Data.ByteString.Short.Internal as ShortByteString
 
 
 deriving instance Functor m => Functor (UnfoldlM m)
@@ -98,6 +100,11 @@ foldM (FoldM step init extract) view =
     finalState <- foldlM' step initialState view
     extract finalState
 
+{-| Lift a fold input mapping function into a mapping of unfolds -}
+{-# INLINE mapFoldMInput #-}
+mapFoldMInput :: Monad m => (forall x. FoldM m b x -> FoldM m a x) -> UnfoldlM m a -> UnfoldlM m b
+mapFoldMInput newFoldM unfoldM = UnfoldlM $ \ step init -> foldM (newFoldM (FoldM step (return init) return)) unfoldM
+
 {-| Construct from any foldable -}
 {-# INLINE foldable #-}
 foldable :: (Monad m, Foldable foldable) => foldable a -> UnfoldlM m a
@@ -116,7 +123,7 @@ foldrRunner run = UnfoldlM (\ stepM -> run (\ x k z -> stepM z x >>= k) return)
 unfoldr :: Monad m => Unfoldr a -> UnfoldlM m a
 unfoldr (Unfoldr unfoldr) = foldrRunner unfoldr
 
-{-| Filter -}
+{-| Filter the values given a predicate -}
 {-# INLINE filter #-}
 filter :: Monad m => (a -> m Bool) -> UnfoldlM m a -> UnfoldlM m a
 filter test (UnfoldlM run) = UnfoldlM (\ step -> run (\ state element -> test element >>= bool (return state) (step state element)))
@@ -147,3 +154,41 @@ tVarValue var = UnfoldlM $ \ step state -> do
 hoist :: (forall a. m a -> n a) -> (forall a. n a -> m a) -> UnfoldlM m a -> UnfoldlM n a
 hoist trans1 trans2 (UnfoldlM unfold) = UnfoldlM $ \ step init -> 
   trans1 (unfold (\ a b -> trans2 (step a b)) init)
+
+{-| Bytes of a bytestring -}
+{-# INLINABLE byteStringBytes #-}
+byteStringBytes :: ByteString -> UnfoldlM IO Word8
+byteStringBytes (ByteString.PS fp off len) =
+  UnfoldlM $ \ step init ->
+  withForeignPtr fp $ \ ptr ->
+  let
+    endPtr = plusPtr ptr (off + len)
+    iterate !state !ptr = if ptr == endPtr
+      then return state
+      else do
+        x <- peek ptr
+        newState <- step state x
+        iterate newState (plusPtr ptr 1)
+    in iterate init (plusPtr ptr off)
+
+{-| Bytes of a short bytestring -}
+{-# INLINE shortByteStringBytes #-}
+shortByteStringBytes :: Monad m => ShortByteString -> UnfoldlM m Word8
+shortByteStringBytes (ShortByteString.SBS ba#) = primArray (PrimArray ba#)
+
+{-| Elements of a prim array -}
+{-# INLINE primArray #-}
+primArray :: (Monad m, Prim prim) => PrimArray prim -> UnfoldlM m prim
+primArray pa = UnfoldlM $ \ f z -> foldlPrimArrayM' f z pa
+
+{-| Elements of a prim array coming paired with indices -}
+{-# INLINE primArrayWithIndices #-}
+primArrayWithIndices :: (Monad m, Prim prim) => PrimArray prim -> UnfoldlM m (Int, prim)
+primArrayWithIndices pa = UnfoldlM $ \ step state -> let
+  !size = sizeofPrimArray pa
+  iterate index !state = if index < size
+    then do
+      newState <- step state (index, indexPrimArray pa index)
+      iterate (succ index) newState
+    else return state
+  in iterate 0 state
