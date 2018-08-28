@@ -2,6 +2,10 @@ name: deferred-folds
 version: 0.6.12
 category: Folding
 synopsis: Abstractions over deferred folds
+description:
+  This library is in an experimental state.
+  Users should be prepared for frequent updates.
+stability: Experimental
 homepage: https://github.com/metrix-ai/deferred-folds
 bug-reports: https://github.com/metrix-ai/deferred-folds/issues
 author: Nikita Volkov <nikita.y.volkov@mail.ru>
