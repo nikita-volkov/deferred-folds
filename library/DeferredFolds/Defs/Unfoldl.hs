@@ -99,15 +99,15 @@ intsInRange from to =
     in loop init from
 
 {-| Associations of a map -}
-{-# INLINE map #-}
-map :: Map key value -> Unfoldl (key, value)
-map map =
+{-# INLINE mapAssocs #-}
+mapAssocs :: Map key value -> Unfoldl (key, value)
+mapAssocs map =
   Unfoldl (\ step init -> C.foldlWithKey' (\ state key value -> step state (key, value)) init map)
 
 {-| Associations of an intmap -}
-{-# INLINE intMap #-}
-intMap :: IntMap value -> Unfoldl (Int, value)
-intMap intMap =
+{-# INLINE intMapAssocs #-}
+intMapAssocs :: IntMap value -> Unfoldl (Int, value)
+intMapAssocs intMap =
   Unfoldl (\ step init -> D.foldlWithKey' (\ state key value -> step state (key, value)) init intMap)
 
 {-| Bytes of a bytestring -}
