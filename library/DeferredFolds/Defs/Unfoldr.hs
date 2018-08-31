@@ -1,7 +1,7 @@
 module DeferredFolds.Defs.Unfoldr
 where
 
-import DeferredFolds.Prelude hiding (fold)
+import DeferredFolds.Prelude hiding (fold, reverse)
 import DeferredFolds.Types
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap.Strict as IntMap
@@ -128,3 +128,27 @@ primArrayWithIndices pa = Unfoldr $ \ step state -> let
     then step (index, indexPrimArray pa index) (loop (succ index))
     else state
   in loop 0
+
+{-|
+Extract individual digits of a non-negative integral number.
+-}
+digits :: Integral a => a -> Unfoldr a
+digits = reverse . reverseDigits
+
+{-|
+Extract individual digits of a non-negative integral number in reverse order.
+More efficient than 'digits'.
+-}
+reverseDigits :: Integral a => a -> Unfoldr a
+reverseDigits x = Unfoldr $ \ step init -> let
+  loop x = case divMod x 10 of
+    (next, digit) -> step digit (if next <= 0 then init else loop next)
+  in loop x
+
+{-|
+Reverse the order
+
+Use with care, because it requires to allocate all elements.
+-}
+reverse :: Unfoldr a -> Unfoldr a
+reverse (Unfoldr unfoldr) = Unfoldr $ \ step -> unfoldr (\ a f -> f . step a) id
