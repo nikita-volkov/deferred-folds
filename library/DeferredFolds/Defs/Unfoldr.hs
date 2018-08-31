@@ -152,3 +152,11 @@ Use with care, because it requires to allocate all elements.
 -}
 reverse :: Unfoldr a -> Unfoldr a
 reverse (Unfoldr unfoldr) = Unfoldr $ \ step -> unfoldr (\ a f -> f . step a) id
+
+{-|
+Lift into an unfold, which produces pairs with index.
+-}
+zipWithIndex :: Unfoldr a -> Unfoldr (Int, a)
+zipWithIndex (Unfoldr unfoldr) = Unfoldr $ \ step init -> snd $ unfoldr
+  (\ a (index, state) -> (succ index, step (index, a) state))
+  (0, init)
