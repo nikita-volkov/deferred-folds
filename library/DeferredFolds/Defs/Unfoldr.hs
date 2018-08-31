@@ -58,11 +58,6 @@ instance Show a => Show (Unfoldr a) where
 fold :: Fold input output -> Unfoldr input -> output
 fold (Fold step init extract) = extract . foldl' step init
 
-{-| Unlift a monadic unfold -}
-{-# INLINE unfoldrM #-}
-unfoldrM :: UnfoldrM Identity input -> Unfoldr input
-unfoldrM (UnfoldrM runFoldM) = Unfoldr (\ step init -> runIdentity (runFoldM (\ a b -> return (step a b)) init))
-
 {-| Construct from any foldable -}
 {-# INLINE foldable #-}
 foldable :: Foldable foldable => foldable a -> Unfoldr a
