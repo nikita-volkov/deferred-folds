@@ -127,16 +127,25 @@ primArrayWithIndices pa = Unfoldr $ \ step state -> let
 {-|
 Extract individual digits of a non-negative integral number.
 -}
-digits :: Integral a => a -> Unfoldr a
-digits = reverse . reverseDigits
+decimalDigits :: Integral a => a -> Unfoldr a
+decimalDigits = reverse . reverseDecimalDigits
 
 {-|
 Extract individual digits of a non-negative integral number in reverse order.
 More efficient than 'digits'.
 -}
-reverseDigits :: Integral a => a -> Unfoldr a
-reverseDigits x = Unfoldr $ \ step init -> let
-  loop x = case divMod x 10 of
+reverseDecimalDigits :: Integral a => a -> Unfoldr a
+reverseDecimalDigits = reverseDigits 10
+
+hexadecimalDigits :: Integral a => a -> Unfoldr a
+hexadecimalDigits = reverse . reverseHexadecimalDigits
+
+reverseHexadecimalDigits :: Integral a => a -> Unfoldr a
+reverseHexadecimalDigits = reverseDigits 16
+
+reverseDigits :: Integral a => a -> a -> Unfoldr a
+reverseDigits radix x = Unfoldr $ \ step init -> let
+  loop x = case divMod x radix of
     (next, digit) -> step digit (if next <= 0 then init else loop next)
   in loop x
 
