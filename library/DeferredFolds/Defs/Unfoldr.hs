@@ -149,9 +149,9 @@ reverse :: Unfoldr a -> Unfoldr a
 reverse (Unfoldr unfoldr) = Unfoldr $ \ step -> unfoldr (\ a f -> f . step a) id
 
 {-|
-Lift into an unfold, which produces pairs with index.
+Lift into an unfold, which produces pairs with right-associative index.
 -}
-zipWithIndex :: Unfoldr a -> Unfoldr (Int, a)
-zipWithIndex (Unfoldr unfoldr) = Unfoldr $ \ step init -> snd $ unfoldr
+zipWithReverseIndex :: Unfoldr a -> Unfoldr (Int, a)
+zipWithReverseIndex (Unfoldr unfoldr) = Unfoldr $ \ step init -> snd $ unfoldr
   (\ a (index, state) -> (succ index, step (index, a) state))
   (0, init)
