@@ -137,20 +137,37 @@ More efficient than 'digits'.
 reverseDecimalDigits :: Integral a => a -> Unfoldr a
 reverseDecimalDigits = reverseDigits 10
 
+{-|
+Hexadecimal digits of a number.
+-}
 hexadecimalDigits :: Integral a => a -> Unfoldr a
 hexadecimalDigits = reverse . reverseHexadecimalDigits
 
+{-|
+Hexadecimal digits of a number in reverse order.
+-}
 reverseHexadecimalDigits :: Integral a => a -> Unfoldr a
 reverseHexadecimalDigits = reverseDigits 16
 
-reverseDigits :: Integral a => a -> a -> Unfoldr a
+{-|
+Digits of a number in numeral system based on the specified radix.
+The digits come in reverse order.
+
+E.g., here's how an unfold of binary digits in proper order looks:
+
+@
+binaryDigits :: Integral a => a -> Unfoldr a
+binaryDigits = 'reverse' . 'reverseDigits' 2
+@
+-}
+reverseDigits :: Integral a => a {-^ Radix -} -> a {-^ Number -} -> Unfoldr a
 reverseDigits radix x = Unfoldr $ \ step init -> let
   loop x = case divMod x radix of
     (next, digit) -> step digit (if next <= 0 then init else loop next)
   in loop x
 
 {-|
-Reverse the order
+Reverse the order.
 
 Use with care, because it requires to allocate all elements.
 -}
