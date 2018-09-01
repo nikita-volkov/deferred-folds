@@ -132,7 +132,7 @@ decimalDigits = reverse . reverseDecimalDigits
 
 {-|
 Extract individual digits of a non-negative integral number in reverse order.
-More efficient than 'digits'.
+More efficient than 'decimalDigits'.
 -}
 reverseDecimalDigits :: Integral a => a -> Unfoldr a
 reverseDecimalDigits = reverseDigits 10
