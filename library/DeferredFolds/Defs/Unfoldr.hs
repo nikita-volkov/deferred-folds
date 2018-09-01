@@ -125,6 +125,30 @@ primArrayWithIndices pa = Unfoldr $ \ step state -> let
   in loop 0
 
 {-|
+Binary digits of a non-negative integral number.
+-}
+binaryDigits :: Integral a => a -> Unfoldr a
+binaryDigits = reverse . reverseBinaryDigits
+
+{-|
+Binary digits of a non-negative integral number in reverse order.
+-}
+reverseBinaryDigits :: Integral a => a -> Unfoldr a
+reverseBinaryDigits = reverseDigits 2
+
+{-|
+Octal digits of a non-negative integral number.
+-}
+octalDigits :: Integral a => a -> Unfoldr a
+octalDigits = reverse . reverseOctalDigits
+
+{-|
+Octal digits of a non-negative integral number in reverse order.
+-}
+reverseOctalDigits :: Integral a => a -> Unfoldr a
+reverseOctalDigits = reverseDigits 8
+
+{-|
 Decimal digits of a non-negative integral number.
 -}
 decimalDigits :: Integral a => a -> Unfoldr a
