@@ -125,32 +125,32 @@ primArrayWithIndices pa = Unfoldr $ \ step state -> let
   in loop 0
 
 {-|
-Extract individual digits of a non-negative integral number.
+Decimal digits of a non-negative integral number.
 -}
 decimalDigits :: Integral a => a -> Unfoldr a
 decimalDigits = reverse . reverseDecimalDigits
 
 {-|
-Extract individual digits of a non-negative integral number in reverse order.
+Decimal digits of a non-negative integral number in reverse order.
 More efficient than 'decimalDigits'.
 -}
 reverseDecimalDigits :: Integral a => a -> Unfoldr a
 reverseDecimalDigits = reverseDigits 10
 
 {-|
-Hexadecimal digits of a number.
+Hexadecimal digits of a non-negative number.
 -}
 hexadecimalDigits :: Integral a => a -> Unfoldr a
 hexadecimalDigits = reverse . reverseHexadecimalDigits
 
 {-|
-Hexadecimal digits of a number in reverse order.
+Hexadecimal digits of a non-negative number in reverse order.
 -}
 reverseHexadecimalDigits :: Integral a => a -> Unfoldr a
 reverseHexadecimalDigits = reverseDigits 16
 
 {-|
-Digits of a number in numeral system based on the specified radix.
+Digits of a non-negative number in numeral system based on the specified radix.
 The digits come in reverse order.
 
 E.g., here's how an unfold of binary digits in proper order looks:
