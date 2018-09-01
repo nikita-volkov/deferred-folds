@@ -68,17 +68,17 @@ foldable foldable = Unfoldr (\ step init -> foldr step init foldable)
 filter :: (a -> Bool) -> Unfoldr a -> Unfoldr a
 filter test (Unfoldr run) = Unfoldr (\ step -> run (\ element state -> if test element then step element state else state))
 
-{-| Ascending infinite stream of ints starting from the one specified -}
-{-# INLINE intsFrom #-}
-intsFrom :: Int -> Unfoldr Int
-intsFrom from = Unfoldr $ \ step init -> let
+{-| Ascending infinite stream of enums starting from the one specified -}
+{-# INLINE enumsFrom #-}
+enumsFrom :: (Enum a) => a -> Unfoldr a
+enumsFrom from = Unfoldr $ \ step init -> let
   loop int = step int (loop (succ int))
   in loop from
 
-{-| Ints in the specified inclusive range -}
-{-# INLINE intsInRange #-}
-intsInRange :: Int -> Int -> Unfoldr Int
-intsInRange from to =
+{-| Enums in the specified inclusive range -}
+{-# INLINE enumsInRange #-}
+enumsInRange :: (Enum a, Ord a) => a -> a -> Unfoldr a
+enumsInRange from to =
   Unfoldr $ \ step init ->
   let
     loop int =
@@ -86,6 +86,16 @@ intsInRange from to =
         then step int (loop (succ int))
         else init
     in loop from
+
+{-| Ascending infinite stream of ints starting from the one specified -}
+{-# INLINE intsFrom #-}
+intsFrom :: Int -> Unfoldr Int
+intsFrom = enumsFrom
+
+{-| Ints in the specified inclusive range -}
+{-# INLINE intsInRange #-}
+intsInRange :: Int -> Int -> Unfoldr Int
+intsInRange = enumsInRange
 
 {-| Associations of a map -}
 {-# INLINE mapAssocs #-}
