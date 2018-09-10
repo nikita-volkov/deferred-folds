@@ -135,6 +135,11 @@ primArrayWithIndices pa = Unfoldr $ \ step state -> let
     else state
   in loop 0
 
+{-| Elements of a vector -}
+{-# INLINE vector #-}
+vector :: GenericVector.Vector vector a => vector a -> Unfoldr a
+vector vector = Unfoldr $ \ step state -> GenericVector.foldr step state vector
+
 {-| Elements of a vector coming paired with indices -}
 {-# INLINE vectorWithIndices #-}
 vectorWithIndices :: GenericVector.Vector vector a => vector a -> Unfoldr (Int, a)
