@@ -7,6 +7,7 @@ import qualified Data.Map.Strict as Map
 import qualified Data.IntMap.Strict as IntMap
 import qualified Data.ByteString as ByteString
 import qualified Data.ByteString.Short.Internal as ShortByteString
+import qualified Data.Vector.Generic as GenericVector
 
 
 deriving instance Functor Unfoldr
@@ -133,6 +134,11 @@ primArrayWithIndices pa = Unfoldr $ \ step state -> let
     then step (index, indexPrimArray pa index) (loop (succ index))
     else state
   in loop 0
+
+{-| Elements of a vector coming paired with indices -}
+{-# INLINE vectorWithIndices #-}
+vectorWithIndices :: GenericVector.Vector vector a => vector a -> Unfoldr (Int, a)
+vectorWithIndices vector = Unfoldr $ \ step state -> GenericVector.ifoldr (\ index a -> step (index, a)) state vector
 
 {-|
 Binary digits of a non-negative integral number.
