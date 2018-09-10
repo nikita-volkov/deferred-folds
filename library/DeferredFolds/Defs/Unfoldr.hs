@@ -220,8 +220,18 @@ reverse :: Unfoldr a -> Unfoldr a
 reverse (Unfoldr unfoldr) = Unfoldr $ \ step -> unfoldr (\ a f -> f . step a) id
 
 {-|
+Lift into an unfold, which produces pairs with index.
+-}
+zipWithIndex :: Unfoldr a -> Unfoldr (Int, a)
+zipWithIndex (Unfoldr unfoldr) = Unfoldr $ \ indexedStep indexedState -> unfoldr
+  (\ a nextStateByIndex index -> indexedStep (index, a) (nextStateByIndex (succ index)))
+  (const indexedState)
+  0
+
+{-|
 Lift into an unfold, which produces pairs with right-associative index.
 -}
+{-# DEPRECATED zipWithReverseIndex "This function builds up stack. Use 'zipWithIndex' instead." #-}
 zipWithReverseIndex :: Unfoldr a -> Unfoldr (Int, a)
 zipWithReverseIndex (Unfoldr unfoldr) = Unfoldr $ \ step init -> snd $ unfoldr
   (\ a (index, state) -> (succ index, step (index, a) state))
