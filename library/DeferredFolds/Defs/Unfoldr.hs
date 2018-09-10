@@ -215,3 +215,31 @@ zipWithReverseIndex :: Unfoldr a -> Unfoldr (Int, a)
 zipWithReverseIndex (Unfoldr unfoldr) = Unfoldr $ \ step init -> snd $ unfoldr
   (\ a (index, state) -> (succ index, step (index, a) state))
   (0, init)
+
+{-|
+Indices of set bits.
+-}
+setBitIndices :: FiniteBits a => a -> Unfoldr Int
+setBitIndices a = let
+  !size = finiteBitSize a
+  in Unfoldr $ \ step state -> let
+    loop !index = if index < size
+      then if testBit a index
+        then step index (loop (succ index))
+        else loop (succ index)
+      else state
+    in loop 0
+
+{-|
+Indices of unset bits.
+-}
+unsetBitIndices :: FiniteBits a => a -> Unfoldr Int
+unsetBitIndices a = let
+  !size = finiteBitSize a
+  in Unfoldr $ \ step state -> let
+    loop !index = if index < size
+      then if testBit a index
+        then loop (succ index)
+        else step index (loop (succ index))
+      else state
+    in loop 0
