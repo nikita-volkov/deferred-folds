@@ -5,6 +5,7 @@ import DeferredFolds.Prelude hiding (fold, reverse)
 import DeferredFolds.Types
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap.Strict as IntMap
+import qualified Data.HashMap.Strict as HashMap
 import qualified Data.ByteString as ByteString
 import qualified Data.ByteString.Short.Internal as ShortByteString
 import qualified Data.Vector.Generic as GenericVector
@@ -109,6 +110,22 @@ mapAssocs map =
 intMapAssocs :: IntMap value -> Unfoldr (Int, value)
 intMapAssocs intMap =
   Unfoldr (\ step init -> IntMap.foldrWithKey (\ key value state -> step (key, value) state) init intMap)
+
+{-| Associations of a hash-map -}
+{-# INLINE hashMapAssocs #-}
+hashMapAssocs :: HashMap key value -> Unfoldr (key, value)
+hashMapAssocs hashMap =
+  Unfoldr (\ step init -> HashMap.foldrWithKey (\ key value state -> step (key, value) state) init hashMap)
+
+{-| Value of a hash-map by key -}
+{-# INLINE hashMapValue #-}
+hashMapValue :: (Hashable key, Eq key) => key -> HashMap key value -> Unfoldr value
+hashMapValue key = foldable . HashMap.lookup key
+
+{-| Values of a hash-map by their keys -}
+{-# INLINE hashMapValues #-}
+hashMapValues :: (Hashable key, Eq key) => HashMap key value -> Unfoldr key -> Unfoldr value
+hashMapValues hashMap keys = keys >>= flip hashMapValue hashMap
 
 {-| Bytes of a bytestring -}
 {-# INLINE byteStringBytes #-}

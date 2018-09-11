@@ -95,3 +95,11 @@ import Data.ByteString.Short as Exports (ShortByteString)
 -- primitive
 -------------------------
 import Data.Primitive as Exports
+
+-- unordered-containers
+-------------------------
+import Data.HashMap.Strict as Exports (HashMap)
+
+-- hashable
+-------------------------
+import Data.Hashable as Exports (Hashable)
