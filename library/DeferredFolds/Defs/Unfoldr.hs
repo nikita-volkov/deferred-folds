@@ -118,7 +118,13 @@ hashMapAssocs hashMap =
   Unfoldr (\ step init -> HashMap.foldrWithKey (\ key value state -> step (key, value) state) init hashMap)
 
 {-| Value of a hash-map by key -}
+{-# INLINE hashMapAt #-}
+hashMapAt :: (Hashable key, Eq key) => HashMap key value -> key -> Unfoldr value
+hashMapAt hashMap key = foldable (HashMap.lookup key hashMap)
+
+{-| Value of a hash-map by key -}
 {-# INLINE hashMapValue #-}
+{-# DEPRECATED hashMapValue "Use 'hashMapAt' instead" #-}
 hashMapValue :: (Hashable key, Eq key) => key -> HashMap key value -> Unfoldr value
 hashMapValue key = foldable . HashMap.lookup key
 
