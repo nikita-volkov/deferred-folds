@@ -25,7 +25,7 @@ import Data.Data as Exports
 import Data.Dynamic as Exports
 import Data.Either as Exports
 import Data.Fixed as Exports
-import Data.Foldable as Exports
+import Data.Foldable as Exports hiding (toList)
 import Data.Function as Exports hiding (id, (.))
 import Data.Functor as Exports
 import Data.Functor.Identity as Exports
@@ -52,7 +52,7 @@ import Foreign.Ptr as Exports
 import Foreign.StablePtr as Exports
 import Foreign.Storable as Exports hiding (sizeOf, alignment)
 import GHC.Conc as Exports hiding (withMVar, threadWaitWriteSTM, threadWaitWrite, threadWaitReadSTM, threadWaitRead)
-import GHC.Exts as Exports (lazy, inline, sortWith, groupWith)
+import GHC.Exts as Exports (lazy, inline, sortWith, groupWith, IsList(..))
 import GHC.Generics as Exports (Generic)
 import GHC.IO.Exception as Exports
 import Numeric as Exports

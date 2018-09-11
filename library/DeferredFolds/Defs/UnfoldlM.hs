@@ -65,6 +65,11 @@ instance Eq a => Eq (UnfoldlM Identity a) where
 instance Show a => Show (UnfoldlM Identity a) where
   show = show . toList
 
+instance IsList (UnfoldlM Identity a) where
+  type Item (UnfoldlM Identity a) = a
+  fromList list = foldable list
+  toList = foldr (:) []
+
 {-| Check whether it's empty -}
 {-# INLINE null #-}
 null :: Monad m => UnfoldlM m input -> m Bool

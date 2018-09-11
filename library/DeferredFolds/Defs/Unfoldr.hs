@@ -55,6 +55,11 @@ instance Eq a => Eq (Unfoldr a) where
 instance Show a => Show (Unfoldr a) where
   show = show . toList
 
+instance IsList (Unfoldr a) where
+  type Item (Unfoldr a) = a
+  fromList list = foldable list
+  toList = foldr (:) []
+
 {-| Apply a Gonzalez fold -}
 {-# INLINE fold #-}
 fold :: Fold input output -> Unfoldr input -> output
