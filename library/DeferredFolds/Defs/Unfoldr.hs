@@ -298,3 +298,18 @@ unsetBitIndices a = let
         else step index (loop (succ index))
       else state
     in loop 0
+
+take :: Int -> Unfoldr a -> Unfoldr a
+take amount (Unfoldr unfoldr) = Unfoldr $ \ step init -> unfoldr
+  (\ a nextState index -> if index < amount
+    then step a (nextState (succ index))
+    else init)
+  (const init)
+  0
+
+takeWhile :: (a -> Bool) -> Unfoldr a -> Unfoldr a
+takeWhile predicate (Unfoldr unfoldr) = Unfoldr $ \ step init -> unfoldr
+  (\ a nextState -> if predicate a
+    then step a nextState
+    else init)
+  init
