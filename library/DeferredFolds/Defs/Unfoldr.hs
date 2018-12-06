@@ -313,3 +313,9 @@ takeWhile predicate (Unfoldr unfoldr) = Unfoldr $ \ step init -> unfoldr
     then step a nextState
     else init)
   init
+
+cons :: a -> Unfoldr a -> Unfoldr a
+cons a (Unfoldr unfoldr) = Unfoldr $ \ step init -> step a (unfoldr step init)
+
+snoc :: a -> Unfoldr a -> Unfoldr a
+snoc a (Unfoldr unfoldr) = Unfoldr $ \ step init -> unfoldr step (step a init)
