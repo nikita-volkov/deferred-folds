@@ -13,7 +13,7 @@ since its concatenation (`<>`) has complexity of @O(1)@.
 
 [Intuition]
 
-The intuition of what this abstraction is all about can be derived from lists.
+The intuition for this abstraction can be derived from lists.
 
 Let's consider the `Data.List.foldl'` function for lists:
 
