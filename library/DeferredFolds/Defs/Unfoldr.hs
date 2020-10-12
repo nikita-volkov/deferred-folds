@@ -319,3 +319,20 @@ cons a (Unfoldr unfoldr) = Unfoldr $ \ step init -> step a (unfoldr step init)
 
 snoc :: a -> Unfoldr a -> Unfoldr a
 snoc a (Unfoldr unfoldr) = Unfoldr $ \ step init -> unfoldr step (step a init)
+
+{-|
+Insert a separator value between each element.
+
+Behaves the same way as 'Data.List.intersperse'.
+-}
+{-# INLINE intersperse #-}
+intersperse :: a -> Unfoldr a -> Unfoldr a
+intersperse sep (Unfoldr unfoldr) =
+  Unfoldr $ \ step init ->
+    unfoldr
+      (\ a next first ->
+        if first
+          then step a (next False)
+          else step sep (step a (next False)))
+      (const init)
+      True

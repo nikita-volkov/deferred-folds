@@ -24,4 +24,8 @@ main =
     testProperty "takeWhile odd" $ \ (list :: [Int]) ->
     takeWhile odd list ===
     toList (Unfoldr.takeWhile odd (Unfoldr.foldable list))
+    ,
+    testProperty "intersperse" $ \ (list :: [Char]) -> 
+    intersperse ',' list ===
+    toList (Unfoldr.intersperse ',' (Unfoldr.foldable list))
   ]
