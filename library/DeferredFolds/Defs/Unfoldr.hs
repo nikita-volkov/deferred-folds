@@ -122,6 +122,12 @@ intMapAssocs :: IntMap value -> Unfoldr (Int, value)
 intMapAssocs intMap =
   Unfoldr (\ step init -> IntMap.foldrWithKey (\ key value state -> step (key, value) state) init intMap)
 
+{-| Keys of a hash-map -}
+{-# INLINE hashMapKeys #-}
+hashMapKeys :: HashMap key value -> Unfoldr key
+hashMapKeys hashMap =
+  Unfoldr (\ step init -> HashMap.foldrWithKey (\ key _ state -> step key state) init hashMap)
+
 {-| Associations of a hash-map -}
 {-# INLINE hashMapAssocs #-}
 hashMapAssocs :: HashMap key value -> Unfoldr (key, value)
