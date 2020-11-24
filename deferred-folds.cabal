@@ -9,7 +9,7 @@ stability: Experimental
 homepage: https://github.com/metrix-ai/deferred-folds
 bug-reports: https://github.com/metrix-ai/deferred-folds/issues
 author: Nikita Volkov <nikita.y.volkov@mail.ru>
-maintainer: Metrix.AI Tech Team <tech@metrix.ai>
+maintainer: Nikita Volkov <nikita.y.volkov@mail.ru>
 copyright: (c) 2018, Metrix.AI
 license: MIT
 license-file: LICENSE
