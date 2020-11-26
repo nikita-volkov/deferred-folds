@@ -9,6 +9,7 @@ import Test.Tasty.QuickCheck
 import qualified Test.QuickCheck as QuickCheck
 import qualified Test.QuickCheck.Property as QuickCheck
 import qualified DeferredFolds.Unfoldr as Unfoldr
+import qualified Data.Text as Text
 
 
 main =
@@ -28,4 +29,8 @@ main =
     testProperty "intersperse" $ \ (list :: [Char]) -> 
     intersperse ',' list ===
     toList (Unfoldr.intersperse ',' (Unfoldr.foldable list))
+    ,
+    testProperty "textChars" $ \ (text :: Text) ->
+    Text.unpack text ===
+    toList (Unfoldr.textChars text)
   ]

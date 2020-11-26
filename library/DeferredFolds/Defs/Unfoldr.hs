@@ -9,6 +9,10 @@ import qualified Data.HashMap.Strict as HashMap
 import qualified Data.ByteString as ByteString
 import qualified Data.ByteString.Short.Internal as ShortByteString
 import qualified Data.Vector.Generic as GenericVector
+import qualified Data.Text.Internal as TextInternal
+import qualified Data.Text.Internal.Encoding.Utf16 as TextUtf16
+import qualified Data.Text.Internal.Unsafe.Char as TextChar
+import qualified Data.Text.Array as TextArray
 
 
 deriving instance Functor Unfoldr
@@ -342,3 +346,28 @@ intersperse sep (Unfoldr unfoldr) =
           else step sep (step a (next False)))
       (const init)
       True
+
+textChars :: Text -> Unfoldr Char
+textChars (TextInternal.Text arr off len) =
+  let
+    !end =
+      off + len
+    in
+      Unfoldr $ \ step acc ->
+        let
+          loop !index =
+            if index >= end
+              then acc
+              else let
+                b1 =
+                  TextArray.unsafeIndex arr index
+                in if b1 >= 0xd800 && b1 <= 0xdbff
+                  then let
+                    b2 =
+                      TextArray.unsafeIndex arr (succ index)
+                    char =
+                      TextUtf16.chr2 b1 b2
+                    in step char (loop (index + 2))
+                  else
+                    step (TextChar.unsafeChr b1) (loop (index + 1))
+          in loop 0

@@ -103,3 +103,7 @@ import Data.HashMap.Strict as Exports (HashMap)
 -- hashable
 -------------------------
 import Data.Hashable as Exports (Hashable)
+
+-- text
+-------------------------
+import Data.Text as Exports (Text)
