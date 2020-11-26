@@ -1,11 +1,11 @@
 module DeferredFolds.Util.TextArray
 where
 
-import DeferredFolds.Prelude
+import DeferredFolds.Prelude hiding (Array)
+import Data.Text.Array
 import qualified Data.Text.Internal as TextInternal
 import qualified Data.Text.Internal.Encoding.Utf16 as TextUtf16
 import qualified Data.Text.Internal.Unsafe.Char as TextChar
-import qualified Data.Text.Array as TextArray
 
 
 {-|
@@ -14,15 +14,15 @@ but operates on the array directly,
 uses a continuation and passes the next offset to it instead of delta.
 -}
 {-# INLINE iter #-}
-iter :: TextArray.Array -> Int -> (Char -> Int -> a) -> a
+iter :: Array -> Int -> (Char -> Int -> a) -> a
 iter arr offset cont =
   let
     b1 =
-      TextArray.unsafeIndex arr offset
+      unsafeIndex arr offset
     in if b1 >= 0xd800 && b1 <= 0xdbff
       then let
         b2 =
-          TextArray.unsafeIndex arr (succ offset)
+          unsafeIndex arr (succ offset)
         char =
           TextUtf16.chr2 b1 b2
         in cont char (offset + 2)
