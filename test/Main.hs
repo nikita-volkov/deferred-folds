@@ -37,4 +37,42 @@ main =
     testProperty "textWords" $ \ (text :: Text) ->
     Text.words text ===
     toList (Unfoldr.textWords text)
+    ,
+    testProperty "trimWhitespace 1" $ \ (text :: Text) ->
+    let
+      words =
+        Text.words text
+      run =
+        fromString . toList . Unfoldr.trimWhitespace . Unfoldr.textChars
+      spacedInput =
+        Text.map (\ c -> if isSpace c then ' ' else c) text
+      newlinedInput =
+        Text.map (\ c -> if isSpace c then '\n' else c) text
+      in
+        Text.unwords words === run spacedInput .&&.
+        Text.intercalate "\n" words === run newlinedInput
+    ,
+    testProperty "trimWhitespace 2" $ \ (text :: Text) ->
+    let
+      isNewline c =
+        c == '\n' || c == '\r'
+      isSpaceButNotNewline c =
+        isSpace c && not (isNewline c)
+      normalize separator condition =
+        Text.split condition >>>
+        filter (not . Text.null) >>>
+        Text.intercalate separator
+      expected =
+        text &
+        Text.split isNewline &
+        fmap Text.strip &
+        filter (not . Text.null) &
+        Text.intercalate "\n" &
+        Text.split isSpaceButNotNewline &
+        filter (not . Text.null) &
+        Text.intercalate " "
+      run =
+        fromString . toList . Unfoldr.trimWhitespace . Unfoldr.textChars
+      in
+        expected === run text
   ]

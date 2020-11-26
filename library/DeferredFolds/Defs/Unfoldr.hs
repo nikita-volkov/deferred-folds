@@ -387,3 +387,36 @@ textWords (TextInternal.Text arr off len) =
   where
     chunk startOffset afterEndOffset =
       TextInternal.Text arr startOffset (afterEndOffset - startOffset)
+
+{-|
+Transformer of chars,
+replaces all space-like chars with space,
+all newline-like chars with @\\n@,
+and trims their duplicate sequences to single-char.
+Oh yeah, it also trims whitespace from beginning and end.
+-}
+trimWhitespace :: Foldable f => f Char -> Unfoldr Char
+trimWhitespace =
+  \ foldable ->
+    Unfoldr $ \ substep subterm ->
+      foldr (step substep) (finalize subterm) foldable False False False
+  where
+    step substep char next notFirst spacePending newlinePending =
+      if isSpace char
+        then if char == '\n' || char == '\r'
+          then next notFirst False True
+          else next notFirst True newlinePending
+        else
+          let
+            mapper =
+              if notFirst
+                then if newlinePending
+                  then substep '\n'
+                  else if spacePending
+                    then substep ' '
+                    else id
+                else id
+            in
+              mapper $ substep char $ next True False False
+    finalize subterm notFirst spacePending newlinePending =
+      subterm
