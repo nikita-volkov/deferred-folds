@@ -10,9 +10,7 @@ import qualified Data.ByteString as ByteString
 import qualified Data.ByteString.Short.Internal as ShortByteString
 import qualified Data.Vector.Generic as GenericVector
 import qualified Data.Text.Internal as TextInternal
-import qualified Data.Text.Internal.Encoding.Utf16 as TextUtf16
-import qualified Data.Text.Internal.Unsafe.Char as TextChar
-import qualified Data.Text.Array as TextArray
+import qualified DeferredFolds.Util.TextArray as TextArrayUtil
 
 
 deriving instance Functor Unfoldr
@@ -349,21 +347,13 @@ intersperse sep (Unfoldr unfoldr) =
 
 textChars :: Text -> Unfoldr Char
 textChars (TextInternal.Text arr off len) =
-  Unfoldr $ \ step acc ->
+  Unfoldr $ \ step term ->
     let
-      loop !index =
-        if index >= len
-          then acc
-          else let
-            b1 =
-              TextArray.unsafeIndex arr index
-            in if b1 >= 0xd800 && b1 <= 0xdbff
-              then let
-                b2 =
-                  TextArray.unsafeIndex arr (succ index)
-                char =
-                  TextUtf16.chr2 b1 b2
-                in step char (loop (index + 2))
-              else
-                step (TextChar.unsafeChr b1) (loop (index + 1))
+      loop !offset =
+        if offset >= len
+          then term
+          else 
+            TextArrayUtil.iter
+              (\ char nextOffset -> step char (loop nextOffset))
+              offset arr
       in loop off

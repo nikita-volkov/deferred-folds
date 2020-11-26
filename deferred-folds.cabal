@@ -36,6 +36,7 @@ library
     DeferredFolds.Defs.Unfoldr
     DeferredFolds.Defs.UnfoldrM
     DeferredFolds.Prelude
+    DeferredFolds.Util.TextArray
   build-depends:
     base >=4.9 && <5,
     bytestring >=0.10 && <0.12,
