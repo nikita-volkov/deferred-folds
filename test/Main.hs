@@ -33,4 +33,8 @@ main =
     testProperty "textChars" $ \ (text :: Text) ->
     Text.unpack text ===
     toList (Unfoldr.textChars text)
+    ,
+    testProperty "textWords" $ \ (text :: Text) ->
+    Text.words text ===
+    toList (Unfoldr.textWords text)
   ]

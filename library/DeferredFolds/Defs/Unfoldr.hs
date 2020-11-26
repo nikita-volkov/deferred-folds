@@ -356,3 +356,24 @@ textChars (TextInternal.Text arr off len) =
             TextArrayUtil.iter arr offset $ \ char nextOffset ->
               step char (loop nextOffset)
       in loop off
+
+textWords :: Text -> Unfoldr Text
+textWords (TextInternal.Text arr off len) =
+  Unfoldr $ \ step term ->
+    let
+      loop !wordOffset !offset =
+        if offset >= len
+          then if wordOffset == offset
+            then term
+            else step (chunk wordOffset offset) term
+          else
+            TextArrayUtil.iter arr offset $ \ char nextOffset ->
+              if isSpace char
+                then if wordOffset == offset
+                  then loop nextOffset nextOffset
+                  else step (chunk wordOffset offset) (loop nextOffset nextOffset)
+                else loop wordOffset nextOffset
+      in loop off off
+  where
+    chunk startOffset afterEndOffset =
+      TextInternal.Text arr startOffset (afterEndOffset - startOffset)
