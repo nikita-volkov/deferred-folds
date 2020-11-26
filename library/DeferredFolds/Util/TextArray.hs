@@ -10,11 +10,12 @@ import qualified Data.Text.Array as TextArray
 
 {-|
 Same as 'Data.Text.Unsafe.iter',
-but operates on the array directly.
+but operates on the array directly,
+uses a continuation and passes the next offset to it instead of delta.
 -}
 {-# INLINE iter #-}
-iter :: (Char -> Int -> a) -> Int -> TextArray.Array -> a
-iter cont offset arr =
+iter :: TextArray.Array -> Int -> (Char -> Int -> a) -> a
+iter arr offset cont =
   let
     b1 =
       TextArray.unsafeIndex arr offset

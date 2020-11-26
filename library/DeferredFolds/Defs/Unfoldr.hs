@@ -353,7 +353,6 @@ textChars (TextInternal.Text arr off len) =
         if offset >= len
           then term
           else 
-            TextArrayUtil.iter
-              (\ char nextOffset -> step char (loop nextOffset))
-              offset arr
+            TextArrayUtil.iter arr offset $ \ char nextOffset ->
+              step char (loop nextOffset)
       in loop off
