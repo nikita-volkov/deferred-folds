@@ -395,7 +395,7 @@ all newline-like chars with @\\n@,
 and trims their duplicate sequences to single-char.
 Oh yeah, it also trims whitespace from beginning and end.
 -}
-trimWhitespace :: Foldable f => f Char -> Unfoldr Char
+trimWhitespace :: Unfoldr Char -> Unfoldr Char
 trimWhitespace =
   \ foldable ->
     Unfoldr $ \ substep subterm ->
