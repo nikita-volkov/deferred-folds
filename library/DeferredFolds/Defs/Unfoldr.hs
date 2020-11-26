@@ -345,6 +345,11 @@ intersperse sep (Unfoldr unfoldr) =
       (const init)
       True
 
+{-|
+Reproduces the behaviour of 'Data.Text.unpack'.
+
+Implementation is efficient and avoids allocation of an intermediate list.
+-}
 textChars :: Text -> Unfoldr Char
 textChars (TextInternal.Text arr off len) =
   Unfoldr $ \ step term ->
@@ -357,6 +362,11 @@ textChars (TextInternal.Text arr off len) =
               step char (loop nextOffset)
       in loop off
 
+{-|
+Reproduces the behaviour of 'Data.Text.words'.
+
+Implementation is efficient and avoids allocation of an intermediate list.
+-}
 textWords :: Text -> Unfoldr Text
 textWords (TextInternal.Text arr off len) =
   Unfoldr $ \ step term ->
