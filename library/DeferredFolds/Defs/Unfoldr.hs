@@ -9,6 +9,8 @@ import qualified Data.HashMap.Strict as HashMap
 import qualified Data.ByteString as ByteString
 import qualified Data.ByteString.Short.Internal as ShortByteString
 import qualified Data.Vector.Generic as GenericVector
+import qualified Data.Text.Internal as TextInternal
+import qualified DeferredFolds.Util.TextArray as TextArrayUtil
 
 
 deriving instance Functor Unfoldr
@@ -342,3 +344,46 @@ intersperse sep (Unfoldr unfoldr) =
           else step sep (step a (next False)))
       (const init)
       True
+
+{-|
+Reproduces the behaviour of 'Data.Text.unpack'.
+
+Implementation is efficient and avoids allocation of an intermediate list.
+-}
+textChars :: Text -> Unfoldr Char
+textChars (TextInternal.Text arr off len) =
+  Unfoldr $ \ step term ->
+    let
+      loop !offset =
+        if offset >= len
+          then term
+          else 
+            TextArrayUtil.iter arr offset $ \ char nextOffset ->
+              step char (loop nextOffset)
+      in loop off
+
+{-|
+Reproduces the behaviour of 'Data.Text.words'.
+
+Implementation is efficient and avoids allocation of an intermediate list.
+-}
+textWords :: Text -> Unfoldr Text
+textWords (TextInternal.Text arr off len) =
+  Unfoldr $ \ step term ->
+    let
+      loop !wordOffset !offset =
+        if offset >= len
+          then if wordOffset == offset
+            then term
+            else step (chunk wordOffset offset) term
+          else
+            TextArrayUtil.iter arr offset $ \ char nextOffset ->
+              if isSpace char
+                then if wordOffset == offset
+                  then loop nextOffset nextOffset
+                  else step (chunk wordOffset offset) (loop nextOffset nextOffset)
+                else loop wordOffset nextOffset
+      in loop off off
+  where
+    chunk startOffset afterEndOffset =
+      TextInternal.Text arr startOffset (afterEndOffset - startOffset)
