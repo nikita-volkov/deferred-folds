@@ -349,25 +349,21 @@ intersperse sep (Unfoldr unfoldr) =
 
 textChars :: Text -> Unfoldr Char
 textChars (TextInternal.Text arr off len) =
-  let
-    !end =
-      off + len
-    in
-      Unfoldr $ \ step acc ->
-        let
-          loop !index =
-            if index >= end
-              then acc
-              else let
-                b1 =
-                  TextArray.unsafeIndex arr index
-                in if b1 >= 0xd800 && b1 <= 0xdbff
-                  then let
-                    b2 =
-                      TextArray.unsafeIndex arr (succ index)
-                    char =
-                      TextUtf16.chr2 b1 b2
-                    in step char (loop (index + 2))
-                  else
-                    step (TextChar.unsafeChr b1) (loop (index + 1))
-          in loop 0
+  Unfoldr $ \ step acc ->
+    let
+      loop !index =
+        if index >= len
+          then acc
+          else let
+            b1 =
+              TextArray.unsafeIndex arr index
+            in if b1 >= 0xd800 && b1 <= 0xdbff
+              then let
+                b2 =
+                  TextArray.unsafeIndex arr (succ index)
+                char =
+                  TextUtf16.chr2 b1 b2
+                in step char (loop (index + 2))
+              else
+                step (TextChar.unsafeChr b1) (loop (index + 1))
+      in loop off
