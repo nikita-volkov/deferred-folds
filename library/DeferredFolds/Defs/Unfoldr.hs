@@ -65,7 +65,8 @@ instance IsList (Unfoldr a) where
 {-| Apply a Gonzalez fold -}
 {-# INLINE fold #-}
 fold :: Fold input output -> Unfoldr input -> output
-fold (Fold step init extract) = extract . foldl' step init
+fold (Fold step init extract) (Unfoldr run) =
+  run (\ input next state -> next $! step state input) extract init
 
 {-| Apply a monadic Gonzalez fold -}
 {-# INLINE foldM #-}
