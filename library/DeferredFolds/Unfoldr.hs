@@ -5,4 +5,4 @@ module DeferredFolds.Unfoldr
 where
 
 import DeferredFolds.Types as Exports (Unfoldr(..))
-import DeferredFolds.Defs.Unfoldr as Exports
+import DeferredFolds.Defs.Unfoldr as Exports hiding (foldrAndContainer)

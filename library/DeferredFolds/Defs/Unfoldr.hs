@@ -5,6 +5,7 @@ import DeferredFolds.Prelude hiding (fold, reverse)
 import DeferredFolds.Types
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap.Strict as IntMap
+import qualified Data.IntSet as IntSet
 import qualified Data.HashMap.Strict as HashMap
 import qualified Data.ByteString as ByteString
 import qualified Data.ByteString.Short.Internal as ShortByteString
@@ -74,10 +75,20 @@ foldM :: Monad m => FoldM m input output -> Unfoldr input -> m output
 foldM (FoldM step init extract) (Unfoldr unfoldr) =
   init >>= unfoldr (\ input next state -> step state input >>= next) return >>= extract
 
+{-| Construct from any value by supplying a definition of foldr -}
+{-# INLINE foldrAndContainer #-}
+foldrAndContainer :: (forall x. (elem -> x -> x) -> x -> container -> x) -> container -> Unfoldr elem
+foldrAndContainer foldr a = Unfoldr (\ step init -> foldr step init a)
+
 {-| Construct from any foldable -}
 {-# INLINE foldable #-}
 foldable :: Foldable foldable => foldable a -> Unfoldr a
-foldable foldable = Unfoldr (\ step init -> foldr step init foldable)
+foldable = foldrAndContainer foldr
+
+{-| Elements of IntSet. -}
+{-# INLINE intSet #-}
+intSet :: IntSet -> Unfoldr Int
+intSet = foldrAndContainer IntSet.foldr
 
 {-| Filter the values given a predicate -}
 {-# INLINE filter #-}
