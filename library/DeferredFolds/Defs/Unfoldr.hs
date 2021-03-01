@@ -52,6 +52,10 @@ instance Foldable Unfoldr where
   foldl' leftStep state (Unfoldr unfoldr) = unfoldr rightStep id state where
     rightStep element k state = k $! leftStep state element
 
+instance Traversable Unfoldr where
+  traverse f (Unfoldr unfoldr) =
+    unfoldr (\a next -> cons <$> f a <*> next) (pure mempty)
+
 instance Eq a => Eq (Unfoldr a) where
   (==) left right = toList left == toList right
 
