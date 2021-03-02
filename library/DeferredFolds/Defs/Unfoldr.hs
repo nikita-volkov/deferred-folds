@@ -3,6 +3,7 @@ where
 
 import DeferredFolds.Prelude hiding (fold, reverse)
 import DeferredFolds.Types
+import qualified DeferredFolds.Prelude as Prelude
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap.Strict as IntMap
 import qualified Data.IntSet as IntSet
@@ -276,6 +277,10 @@ Use with care, because it requires to allocate all elements.
 -}
 reverse :: Unfoldr a -> Unfoldr a
 reverse (Unfoldr unfoldr) = Unfoldr $ \ step -> unfoldr (\ a f -> f . step a) id
+
+zipWith :: (a -> b -> c) -> Unfoldr a -> Unfoldr b -> Unfoldr c
+zipWith f l r =
+  Prelude.zipWith f (toList l) (toList r) & foldable
 
 {-|
 Lift into an unfold, which produces pairs with index.
