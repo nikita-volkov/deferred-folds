@@ -54,7 +54,7 @@ instance Foldable Unfoldr where
 
 instance Traversable Unfoldr where
   traverse f (Unfoldr unfoldr) =
-    unfoldr (\a next -> cons <$> f a <*> next) (pure mempty)
+    unfoldr (\a next -> liftA2 cons (f a) next) (pure mempty)
 
 instance Eq a => Eq (Unfoldr a) where
   (==) left right = toList left == toList right
