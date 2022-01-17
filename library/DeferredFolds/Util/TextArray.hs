@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 module DeferredFolds.Util.TextArray
 where
 
@@ -6,6 +8,7 @@ import Data.Text.Array
 import qualified Data.Text.Internal as TextInternal
 import qualified Data.Text.Internal.Encoding.Utf16 as TextUtf16
 import qualified Data.Text.Internal.Unsafe.Char as TextChar
+import qualified Data.Text.Unsafe as TextUnsafe
 
 
 {-|
@@ -16,6 +19,9 @@ uses a continuation and passes the next offset to it instead of delta.
 {-# INLINE iter #-}
 iter :: Array -> Int -> (Char -> Int -> a) -> a
 iter arr offset cont =
+#if MIN_VERSION_text(2,0,0)
+  let TextUnsafe.Iter c d = TextUnsafe.iterArray arr offset in cont c (offset + d)
+#else
   let
     b1 =
       unsafeIndex arr offset
@@ -28,3 +34,4 @@ iter arr offset cont =
         in cont char (offset + 2)
       else
         cont (TextChar.unsafeChr b1) (offset + 1)
+#endif
