@@ -17,7 +17,7 @@ import DeferredFolds.Prelude
 --
 -- >foldl' :: (b -> a -> b) -> b -> [a] -> b
 --
--- If we reverse its parameters we get
+-- If we rearrange its parameters we get
 --
 -- >foldl' :: [a] -> (b -> a -> b) -> b -> b
 --
@@ -74,7 +74,7 @@ newtype UnfoldlM m a = UnfoldlM (forall x. (x -> a -> m x) -> x -> m x)
 --
 -- >foldr :: (a -> b -> b) -> b -> [a] -> b
 --
--- If we reverse its parameters we get
+-- If we rearrange its parameters we get
 --
 -- >foldr :: [a] -> (a -> b -> b) -> b -> b
 --
