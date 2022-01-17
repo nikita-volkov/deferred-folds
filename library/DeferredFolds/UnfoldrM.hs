@@ -1,8 +1,7 @@
 module DeferredFolds.UnfoldrM
-(
-  module Exports,
-)
+  ( module Exports,
+  )
 where
 
-import DeferredFolds.Types as Exports (UnfoldrM(..))
 import DeferredFolds.Defs.UnfoldrM as Exports
+import DeferredFolds.Types as Exports (UnfoldrM (..))
