@@ -2,7 +2,7 @@ module DeferredFolds.Defs.UnfoldlM where
 
 import qualified Data.ByteString.Internal as ByteString
 import qualified Data.ByteString.Short.Internal as ShortByteString
-import DeferredFolds.Prelude hiding (foldM, mapM_)
+import DeferredFolds.Prelude hiding (foldM, mapM, mapM_)
 import qualified DeferredFolds.Prelude as A
 import DeferredFolds.Types
 
@@ -79,10 +79,20 @@ foldlM' :: Monad m => (output -> input -> m output) -> output -> UnfoldlM m inpu
 foldlM' step init (UnfoldlM run) =
   run step init
 
+-- | Map each value to a monadic action.
+{-# INLINE mapM #-}
+mapM :: Monad m => (a -> m b) -> UnfoldlM m a -> UnfoldlM m b
+mapM f (UnfoldlM run) = UnfoldlM $ \step -> run $ \x a -> f a >>= step x
+
 -- | A more efficient implementation of mapM_
 {-# INLINE mapM_ #-}
 mapM_ :: Monad m => (input -> m ()) -> UnfoldlM m input -> m ()
 mapM_ step = foldlM' (const step) ()
+
+-- | Same as 'mapM', but with the arguments flipped.
+{-# INLINE forM #-}
+forM :: Monad m => UnfoldlM m a -> (a -> m b) -> UnfoldlM m b
+forM = flip mapM
 
 -- | Same as 'mapM_' with arguments flipped
 {-# INLINE forM_ #-}
