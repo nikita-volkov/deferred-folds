@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-redundant-constraints -Wno-orphans #-}
+
 module DeferredFolds.Defs.Unfoldl where
 
 import qualified Data.ByteString as ByteString
@@ -7,7 +9,6 @@ import qualified Data.Map.Strict as C
 import DeferredFolds.Prelude hiding (fold)
 import qualified DeferredFolds.Prelude as A
 import DeferredFolds.Types
-import qualified DeferredFolds.UnfoldlM as B
 
 deriving instance Functor Unfoldl
 
@@ -53,10 +54,10 @@ instance Foldable Unfoldl where
   {-# INLINE foldl' #-}
   foldl' step init (Unfoldl run) = run step init
 
-instance Eq a => Eq (Unfoldl a) where
+instance (Eq a) => Eq (Unfoldl a) where
   (==) left right = toList left == toList right
 
-instance Show a => Show (Unfoldl a) where
+instance (Show a) => Show (Unfoldl a) where
   show = show . toList
 
 instance IsList (Unfoldl a) where
@@ -81,7 +82,7 @@ mapFoldInput newFold unfold = Unfoldl $ \step init -> fold (newFold (Fold step i
 
 -- | Construct from any foldable
 {-# INLINE foldable #-}
-foldable :: Foldable foldable => foldable a -> Unfoldl a
+foldable :: (Foldable foldable) => foldable a -> Unfoldl a
 foldable foldable = Unfoldl (\step init -> A.foldl' step init foldable)
 
 -- | Filter the values given a predicate
