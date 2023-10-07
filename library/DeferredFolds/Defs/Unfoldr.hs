@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-redundant-constraints -Wno-orphans #-}
+
 module DeferredFolds.Defs.Unfoldr where
 
 import qualified Data.ByteString as ByteString
@@ -56,10 +58,10 @@ instance Traversable Unfoldr where
   traverse f (Unfoldr unfoldr) =
     unfoldr (\a next -> liftA2 cons (f a) next) (pure mempty)
 
-instance Eq a => Eq (Unfoldr a) where
+instance (Eq a) => Eq (Unfoldr a) where
   (==) left right = toList left == toList right
 
-instance Show a => Show (Unfoldr a) where
+instance (Show a) => Show (Unfoldr a) where
   show = show . toList
 
 instance IsList (Unfoldr a) where
@@ -75,7 +77,7 @@ fold (Fold step init extract) (Unfoldr run) =
 
 -- | Apply a monadic Gonzalez fold
 {-# INLINE foldM #-}
-foldM :: Monad m => FoldM m input output -> Unfoldr input -> m output
+foldM :: (Monad m) => FoldM m input output -> Unfoldr input -> m output
 foldM (FoldM step init extract) (Unfoldr unfoldr) =
   init >>= unfoldr (\input next state -> step state input >>= next) return >>= extract
 
@@ -86,7 +88,7 @@ foldrAndContainer foldr a = Unfoldr (\step init -> foldr step init a)
 
 -- | Construct from any foldable
 {-# INLINE foldable #-}
-foldable :: Foldable foldable => foldable a -> Unfoldr a
+foldable :: (Foldable foldable) => foldable a -> Unfoldr a
 foldable = foldrAndContainer foldr
 
 -- | Elements of IntSet.
@@ -195,53 +197,53 @@ primArrayWithIndices pa = Unfoldr $ \step state ->
 
 -- | Elements of a vector
 {-# INLINE vector #-}
-vector :: GenericVector.Vector vector a => vector a -> Unfoldr a
+vector :: (GenericVector.Vector vector a) => vector a -> Unfoldr a
 vector vector = Unfoldr $ \step state -> GenericVector.foldr step state vector
 
 -- | Elements of a vector coming paired with indices
 {-# INLINE vectorWithIndices #-}
-vectorWithIndices :: GenericVector.Vector vector a => vector a -> Unfoldr (Int, a)
+vectorWithIndices :: (GenericVector.Vector vector a) => vector a -> Unfoldr (Int, a)
 vectorWithIndices vector = Unfoldr $ \step state -> GenericVector.ifoldr (\index a -> step (index, a)) state vector
 
 -- |
 -- Binary digits of a non-negative integral number.
-binaryDigits :: Integral a => a -> Unfoldr a
+binaryDigits :: (Integral a) => a -> Unfoldr a
 binaryDigits = reverse . reverseBinaryDigits
 
 -- |
 -- Binary digits of a non-negative integral number in reverse order.
-reverseBinaryDigits :: Integral a => a -> Unfoldr a
+reverseBinaryDigits :: (Integral a) => a -> Unfoldr a
 reverseBinaryDigits = reverseDigits 2
 
 -- |
 -- Octal digits of a non-negative integral number.
-octalDigits :: Integral a => a -> Unfoldr a
+octalDigits :: (Integral a) => a -> Unfoldr a
 octalDigits = reverse . reverseOctalDigits
 
 -- |
 -- Octal digits of a non-negative integral number in reverse order.
-reverseOctalDigits :: Integral a => a -> Unfoldr a
+reverseOctalDigits :: (Integral a) => a -> Unfoldr a
 reverseOctalDigits = reverseDigits 8
 
 -- |
 -- Decimal digits of a non-negative integral number.
-decimalDigits :: Integral a => a -> Unfoldr a
+decimalDigits :: (Integral a) => a -> Unfoldr a
 decimalDigits = reverse . reverseDecimalDigits
 
 -- |
 -- Decimal digits of a non-negative integral number in reverse order.
 -- More efficient than 'decimalDigits'.
-reverseDecimalDigits :: Integral a => a -> Unfoldr a
+reverseDecimalDigits :: (Integral a) => a -> Unfoldr a
 reverseDecimalDigits = reverseDigits 10
 
 -- |
 -- Hexadecimal digits of a non-negative number.
-hexadecimalDigits :: Integral a => a -> Unfoldr a
+hexadecimalDigits :: (Integral a) => a -> Unfoldr a
 hexadecimalDigits = reverse . reverseHexadecimalDigits
 
 -- |
 -- Hexadecimal digits of a non-negative number in reverse order.
-reverseHexadecimalDigits :: Integral a => a -> Unfoldr a
+reverseHexadecimalDigits :: (Integral a) => a -> Unfoldr a
 reverseHexadecimalDigits = reverseDigits 16
 
 -- |
@@ -255,7 +257,7 @@ reverseHexadecimalDigits = reverseDigits 16
 -- binaryDigits = 'reverse' . 'reverseDigits' 2
 -- @
 reverseDigits ::
-  Integral a =>
+  (Integral a) =>
   -- | Radix
   a ->
   -- | Number
@@ -298,7 +300,7 @@ zipWithReverseIndex (Unfoldr unfoldr) = Unfoldr $ \step init ->
 
 -- |
 -- Indices of set bits.
-setBitIndices :: FiniteBits a => a -> Unfoldr Int
+setBitIndices :: (FiniteBits a) => a -> Unfoldr Int
 setBitIndices a =
   let !size = finiteBitSize a
    in Unfoldr $ \step state ->
@@ -313,7 +315,7 @@ setBitIndices a =
 
 -- |
 -- Indices of unset bits.
-unsetBitIndices :: FiniteBits a => a -> Unfoldr Int
+unsetBitIndices :: (FiniteBits a) => a -> Unfoldr Int
 unsetBitIndices a =
   let !size = finiteBitSize a
    in Unfoldr $ \step state ->

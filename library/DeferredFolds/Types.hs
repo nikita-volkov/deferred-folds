@@ -1,7 +1,5 @@
 module DeferredFolds.Types where
 
-import DeferredFolds.Prelude
-
 -- |
 -- A projection on data, which only knows how to execute a strict left-fold.
 --
