@@ -1,0 +1,12 @@
+name: Format the code
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  format:
+    uses: nikita-volkov/haskell-hackage-lib-github-actions-workflows/.github/workflows/format-stage.yaml@f87b88930e05b9310b5bf4ad415c0f6bfcfc0967
+    secrets: inherit
