@@ -1,9 +1,8 @@
 packages: .
-with-compiler: ghc-9.6.3
+with-compiler: ghc-9.8.1
 constraints:
   , primitive >=0.9
 allow-newer:
-  , vector:primitive
   , foldl:primitive
-  , deferred-folds:primitive
+  , foldl:text
   , quickcheck-instances:primitive
