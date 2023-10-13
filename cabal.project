@@ -1,8 +1,1 @@
 packages: .
-with-compiler: ghc-9.8.1
-constraints:
-  , primitive >=0.9
-allow-newer:
-  , foldl:primitive
-  , foldl:text
-  , quickcheck-instances:primitive
