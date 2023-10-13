@@ -1,8 +1,11 @@
 {-# LANGUAGE CPP #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 
 module DeferredFolds.Util.TextArray where
 
 import Data.Text.Array
+import qualified Data.Text.Internal.Encoding.Utf16 as TextUtf16
+import qualified Data.Text.Internal.Unsafe.Char as TextChar
 import qualified Data.Text.Unsafe as TextUnsafe
 import DeferredFolds.Prelude hiding (Array)
 

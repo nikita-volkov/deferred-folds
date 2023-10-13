@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-dodgy-imports #-}
+
 module DeferredFolds.Prelude
   ( module Exports,
   )
