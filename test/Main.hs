@@ -9,9 +9,9 @@ import Prelude
 
 main :: IO ()
 main =
-  defaultMain $
-    testGroup "All" $
-      [ testProperty "List roundtrip" $ \(list :: [Int]) ->
+  defaultMain
+    $ testGroup "All"
+    $ [ testProperty "List roundtrip" $ \(list :: [Int]) ->
           list === toList (Unfoldr.foldable list),
         testProperty "take" $ \(list :: [Int], amount) ->
           take amount list

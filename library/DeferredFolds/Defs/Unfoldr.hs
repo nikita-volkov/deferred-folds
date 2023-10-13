@@ -293,8 +293,8 @@ zipWithIndex (Unfoldr unfoldr) = Unfoldr $ \indexedStep indexedState ->
 {-# DEPRECATED zipWithReverseIndex "This function builds up stack. Use 'zipWithIndex' instead." #-}
 zipWithReverseIndex :: Unfoldr a -> Unfoldr (Int, a)
 zipWithReverseIndex (Unfoldr unfoldr) = Unfoldr $ \step init ->
-  snd $
-    unfoldr
+  snd
+    $ unfoldr
       (\a (index, state) -> (succ index, step (index, a) state))
       (0, init)
 
