@@ -8,5 +8,5 @@ on:
 
 jobs:
   format:
-    uses: nikita-volkov/haskell-hackage-lib-github-actions-workflows/.github/workflows/format-stage.yaml@f2e81a9cab99f0f8adf0a5ce26770c587f908399
+    uses: nikita-volkov/haskell-hackage-lib-github-actions-workflows/.github/workflows/format-stage.yaml@main
     secrets: inherit

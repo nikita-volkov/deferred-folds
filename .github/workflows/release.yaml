@@ -15,7 +15,7 @@ concurrency:
 jobs:
 
   release:
-    uses: nikita-volkov/haskell-hackage-lib-github-actions-workflows/.github/workflows/release-stage.yaml@f2e81a9cab99f0f8adf0a5ce26770c587f908399
+    uses: nikita-volkov/haskell-hackage-lib-github-actions-workflows/.github/workflows/release-stage.yaml@main
     secrets: inherit
     with:
       prefix-tag-with-v: false
