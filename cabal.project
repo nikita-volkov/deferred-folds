@@ -1,1 +1,8 @@
 packages: .
+allow-newer:
+  , foldl:primitive
+  , foldl:text
+  , foldl:bytestring
+  , rebase:bytestring
+  , quickcheck-instances:primitive
+  
