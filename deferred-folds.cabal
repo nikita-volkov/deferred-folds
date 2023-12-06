@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          deferred-folds
-version:       0.9.18.5
+version:       0.9.18.6
 category:      Folding
 synopsis:      Abstractions over deferred folds
 description:
@@ -8,8 +8,8 @@ description:
   Users should be prepared for frequent updates.
 
 stability:     Experimental
-homepage:      https://github.com/metrix-ai/deferred-folds
-bug-reports:   https://github.com/metrix-ai/deferred-folds/issues
+homepage:      https://github.com/nikita-volkov/deferred-folds
+bug-reports:   https://github.com/nikita-volkov/deferred-folds/issues
 author:        Nikita Volkov <nikita.y.volkov@mail.ru>
 maintainer:    Nikita Volkov <nikita.y.volkov@mail.ru>
 copyright:     (c) 2018, Metrix.AI
@@ -81,7 +81,7 @@ library
   build-depends:
     , base >=4.9 && <5
     , bytestring >=0.10 && <0.13
-    , containers >=0.5 && <0.7
+    , containers >=0.5 && <0.8
     , foldl >=1 && <2
     , hashable >=1 && <2
     , primitive >=0.6.4 && <0.10
