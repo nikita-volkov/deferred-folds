@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          deferred-folds
-version:       0.9.18.5
+version:       0.9.18.6
 category:      Folding
 synopsis:      Abstractions over deferred folds
 description:
