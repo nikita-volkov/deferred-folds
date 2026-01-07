@@ -125,8 +125,8 @@ foldlRunner run = UnfoldlM (\stepM state -> run (\stateM a -> stateM >>= \state 
 foldrRunner :: (Monad m) => (forall x. (a -> x -> x) -> x -> x) -> UnfoldlM m a
 foldrRunner run = UnfoldlM (\stepM -> run (\x k z -> stepM z x >>= k) return)
 
-{-# INLINABLE unfoldr #-}
-unfoldr :: Monad m => Unfoldr a -> UnfoldlM m a
+{-# INLINEABLE unfoldr #-}
+unfoldr :: (Monad m) => Unfoldr a -> UnfoldlM m a
 unfoldr (Unfoldr unfoldr) = foldrRunner unfoldr
 
 -- | Filter the values given a predicate
