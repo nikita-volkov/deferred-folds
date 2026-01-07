@@ -125,6 +125,7 @@ foldlRunner run = UnfoldlM (\stepM state -> run (\stateM a -> stateM >>= \state 
 foldrRunner :: (Monad m) => (forall x. (a -> x -> x) -> x -> x) -> UnfoldlM m a
 foldrRunner run = UnfoldlM (\stepM -> run (\x k z -> stepM z x >>= k) return)
 
+{-# INLINEABLE unfoldr #-}
 unfoldr :: (Monad m) => Unfoldr a -> UnfoldlM m a
 unfoldr (Unfoldr unfoldr) = foldrRunner unfoldr
 

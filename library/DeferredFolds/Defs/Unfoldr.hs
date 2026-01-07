@@ -207,42 +207,50 @@ vectorWithIndices vector = Unfoldr $ \step state -> GenericVector.ifoldr (\index
 
 -- |
 -- Binary digits of a non-negative integral number.
+{-# INLINEABLE binaryDigits #-}
 binaryDigits :: (Integral a) => a -> Unfoldr a
 binaryDigits = reverse . reverseBinaryDigits
 
 -- |
 -- Binary digits of a non-negative integral number in reverse order.
+{-# INLINEABLE reverseBinaryDigits #-}
 reverseBinaryDigits :: (Integral a) => a -> Unfoldr a
 reverseBinaryDigits = reverseDigits 2
 
 -- |
 -- Octal digits of a non-negative integral number.
+{-# INLINEABLE octalDigits #-}
 octalDigits :: (Integral a) => a -> Unfoldr a
 octalDigits = reverse . reverseOctalDigits
 
 -- |
 -- Octal digits of a non-negative integral number in reverse order.
+{-# INLINEABLE reverseOctalDigits #-}
 reverseOctalDigits :: (Integral a) => a -> Unfoldr a
 reverseOctalDigits = reverseDigits 8
 
 -- |
 -- Decimal digits of a non-negative integral number.
+{-# INLINEABLE decimalDigits #-}
 decimalDigits :: (Integral a) => a -> Unfoldr a
 decimalDigits = reverse . reverseDecimalDigits
 
 -- |
 -- Decimal digits of a non-negative integral number in reverse order.
 -- More efficient than 'decimalDigits'.
+{-# INLINEABLE reverseDecimalDigits #-}
 reverseDecimalDigits :: (Integral a) => a -> Unfoldr a
 reverseDecimalDigits = reverseDigits 10
 
 -- |
 -- Hexadecimal digits of a non-negative number.
+{-# INLINEABLE hexadecimalDigits #-}
 hexadecimalDigits :: (Integral a) => a -> Unfoldr a
 hexadecimalDigits = reverse . reverseHexadecimalDigits
 
 -- |
 -- Hexadecimal digits of a non-negative number in reverse order.
+{-# INLINEABLE reverseHexadecimalDigits #-}
 reverseHexadecimalDigits :: (Integral a) => a -> Unfoldr a
 reverseHexadecimalDigits = reverseDigits 16
 
@@ -256,6 +264,7 @@ reverseHexadecimalDigits = reverseDigits 16
 -- binaryDigits :: Integral a => a -> Unfoldr a
 -- binaryDigits = 'reverse' . 'reverseDigits' 2
 -- @
+{-# INLINEABLE reverseDigits #-}
 reverseDigits ::
   (Integral a) =>
   -- | Radix
@@ -300,6 +309,7 @@ zipWithReverseIndex (Unfoldr unfoldr) = Unfoldr $ \step init ->
 
 -- |
 -- Indices of set bits.
+{-# INLINEABLE setBitIndices #-}
 setBitIndices :: (FiniteBits a) => a -> Unfoldr Int
 setBitIndices a =
   let !size = finiteBitSize a
@@ -315,6 +325,7 @@ setBitIndices a =
 
 -- |
 -- Indices of unset bits.
+{-# INLINEABLE unsetBitIndices #-}
 unsetBitIndices :: (FiniteBits a) => a -> Unfoldr Int
 unsetBitIndices a =
   let !size = finiteBitSize a
