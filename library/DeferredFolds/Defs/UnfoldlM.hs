@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-redundant-constraints -Wno-orphans #-}
+
 module DeferredFolds.Defs.UnfoldlM where
 
 import qualified Data.ByteString.Internal as ByteString
@@ -6,21 +8,21 @@ import DeferredFolds.Prelude hiding (foldM, mapM_)
 import qualified DeferredFolds.Prelude as A
 import DeferredFolds.Types
 
-deriving instance Functor m => Functor (UnfoldlM m)
+deriving instance (Functor m) => Functor (UnfoldlM m)
 
-instance Monad m => Applicative (UnfoldlM m) where
+instance (Monad m) => Applicative (UnfoldlM m) where
   pure x =
     UnfoldlM (\step init -> step init x)
   (<*>) = ap
 
-instance Monad m => Alternative (UnfoldlM m) where
+instance (Monad m) => Alternative (UnfoldlM m) where
   empty =
     UnfoldlM (const return)
   {-# INLINE (<|>) #-}
   (<|>) (UnfoldlM left) (UnfoldlM right) =
     UnfoldlM (\step init -> left step init >>= right step)
 
-instance Monad m => Monad (UnfoldlM m) where
+instance (Monad m) => Monad (UnfoldlM m) where
   return = pure
   {-# INLINE (>>=) #-}
   (>>=) (UnfoldlM left) rightK =
@@ -31,17 +33,17 @@ instance Monad m => Monad (UnfoldlM m) where
                 right step output
        in left newStep init
 
-instance Monad m => MonadPlus (UnfoldlM m) where
+instance (Monad m) => MonadPlus (UnfoldlM m) where
   mzero = empty
   mplus = (<|>)
 
 instance MonadTrans UnfoldlM where
   lift m = UnfoldlM (\step init -> m >>= step init)
 
-instance Monad m => Semigroup (UnfoldlM m a) where
+instance (Monad m) => Semigroup (UnfoldlM m a) where
   (<>) = (<|>)
 
-instance Monad m => Monoid (UnfoldlM m a) where
+instance (Monad m) => Monoid (UnfoldlM m a) where
   mempty = empty
   mappend = (<>)
 
@@ -57,10 +59,10 @@ instance Foldable (UnfoldlM Identity) where
     where
       identityStep state input = return (step state input)
 
-instance Eq a => Eq (UnfoldlM Identity a) where
+instance (Eq a) => Eq (UnfoldlM Identity a) where
   (==) left right = toList left == toList right
 
-instance Show a => Show (UnfoldlM Identity a) where
+instance (Show a) => Show (UnfoldlM Identity a) where
   show = show . toList
 
 instance IsList (UnfoldlM Identity a) where
@@ -70,23 +72,23 @@ instance IsList (UnfoldlM Identity a) where
 
 -- | Check whether it's empty
 {-# INLINE null #-}
-null :: Monad m => UnfoldlM m input -> m Bool
+null :: (Monad m) => UnfoldlM m input -> m Bool
 null (UnfoldlM run) = run (\_ _ -> return False) True
 
 -- | Perform a monadic strict left fold
 {-# INLINE foldlM' #-}
-foldlM' :: Monad m => (output -> input -> m output) -> output -> UnfoldlM m input -> m output
+foldlM' :: (Monad m) => (output -> input -> m output) -> output -> UnfoldlM m input -> m output
 foldlM' step init (UnfoldlM run) =
   run step init
 
 -- | A more efficient implementation of mapM_
 {-# INLINE mapM_ #-}
-mapM_ :: Monad m => (input -> m ()) -> UnfoldlM m input -> m ()
+mapM_ :: (Monad m) => (input -> m ()) -> UnfoldlM m input -> m ()
 mapM_ step = foldlM' (const step) ()
 
 -- | Same as 'mapM_' with arguments flipped
 {-# INLINE forM_ #-}
-forM_ :: Monad m => UnfoldlM m input -> (input -> m ()) -> m ()
+forM_ :: (Monad m) => UnfoldlM m input -> (input -> m ()) -> m ()
 forM_ = flip mapM_
 
 -- | Apply a Gonzalez fold
@@ -96,7 +98,7 @@ fold (Fold step init extract) = extract . foldl' step init
 
 -- | Apply a monadic Gonzalez fold
 {-# INLINE foldM #-}
-foldM :: Monad m => FoldM m input output -> UnfoldlM m input -> m output
+foldM :: (Monad m) => FoldM m input output -> UnfoldlM m input -> m output
 foldM (FoldM step init extract) view =
   do
     initialState <- init
@@ -105,7 +107,7 @@ foldM (FoldM step init extract) view =
 
 -- | Lift a fold input mapping function into a mapping of unfolds
 {-# INLINE mapFoldMInput #-}
-mapFoldMInput :: Monad m => (forall x. FoldM m b x -> FoldM m a x) -> UnfoldlM m a -> UnfoldlM m b
+mapFoldMInput :: (Monad m) => (forall x. FoldM m b x -> FoldM m a x) -> UnfoldlM m a -> UnfoldlM m b
 mapFoldMInput newFoldM unfoldM = UnfoldlM $ \step init -> foldM (newFoldM (FoldM step (return init) return)) unfoldM
 
 -- | Construct from any foldable
@@ -115,12 +117,12 @@ foldable foldable = UnfoldlM (\step init -> A.foldlM step init foldable)
 
 -- | Construct from a specification of how to execute a left-fold
 {-# INLINE foldlRunner #-}
-foldlRunner :: Monad m => (forall x. (x -> a -> x) -> x -> x) -> UnfoldlM m a
+foldlRunner :: (Monad m) => (forall x. (x -> a -> x) -> x -> x) -> UnfoldlM m a
 foldlRunner run = UnfoldlM (\stepM state -> run (\stateM a -> stateM >>= \state -> stepM state a) (return state))
 
 -- | Construct from a specification of how to execute a right-fold
 {-# INLINE foldrRunner #-}
-foldrRunner :: Monad m => (forall x. (a -> x -> x) -> x -> x) -> UnfoldlM m a
+foldrRunner :: (Monad m) => (forall x. (a -> x -> x) -> x -> x) -> UnfoldlM m a
 foldrRunner run = UnfoldlM (\stepM -> run (\x k z -> stepM z x >>= k) return)
 
 {-# INLINABLE unfoldr #-}
@@ -129,12 +131,12 @@ unfoldr (Unfoldr unfoldr) = foldrRunner unfoldr
 
 -- | Filter the values given a predicate
 {-# INLINE filter #-}
-filter :: Monad m => (a -> m Bool) -> UnfoldlM m a -> UnfoldlM m a
+filter :: (Monad m) => (a -> m Bool) -> UnfoldlM m a -> UnfoldlM m a
 filter test (UnfoldlM run) = UnfoldlM (\step -> run (\state element -> test element >>= bool (return state) (step state element)))
 
 -- | Ints in the specified inclusive range
 {-# INLINE intsInRange #-}
-intsInRange :: Monad m => Int -> Int -> UnfoldlM m Int
+intsInRange :: (Monad m) => Int -> Int -> UnfoldlM m Int
 intsInRange from to =
   UnfoldlM $ \step init ->
     let loop !state int =
@@ -176,7 +178,7 @@ byteStringBytes (ByteString.PS fp off len) =
 
 -- | Bytes of a short bytestring
 {-# INLINE shortByteStringBytes #-}
-shortByteStringBytes :: Monad m => ShortByteString -> UnfoldlM m Word8
+shortByteStringBytes :: (Monad m) => ShortByteString -> UnfoldlM m Word8
 shortByteStringBytes (ShortByteString.SBS ba#) = primArray (PrimArray ba#)
 
 -- | Elements of a prim array

@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-redundant-constraints -Wno-orphans #-}
+
 module DeferredFolds.Defs.Unfoldr where
 
 import qualified Data.ByteString as ByteString
@@ -56,10 +58,10 @@ instance Traversable Unfoldr where
   traverse f (Unfoldr unfoldr) =
     unfoldr (\a next -> liftA2 cons (f a) next) (pure mempty)
 
-instance Eq a => Eq (Unfoldr a) where
+instance (Eq a) => Eq (Unfoldr a) where
   (==) left right = toList left == toList right
 
-instance Show a => Show (Unfoldr a) where
+instance (Show a) => Show (Unfoldr a) where
   show = show . toList
 
 instance IsList (Unfoldr a) where
@@ -75,7 +77,7 @@ fold (Fold step init extract) (Unfoldr run) =
 
 -- | Apply a monadic Gonzalez fold
 {-# INLINE foldM #-}
-foldM :: Monad m => FoldM m input output -> Unfoldr input -> m output
+foldM :: (Monad m) => FoldM m input output -> Unfoldr input -> m output
 foldM (FoldM step init extract) (Unfoldr unfoldr) =
   init >>= unfoldr (\input next state -> step state input >>= next) return >>= extract
 
@@ -86,7 +88,7 @@ foldrAndContainer foldr a = Unfoldr (\step init -> foldr step init a)
 
 -- | Construct from any foldable
 {-# INLINE foldable #-}
-foldable :: Foldable foldable => foldable a -> Unfoldr a
+foldable :: (Foldable foldable) => foldable a -> Unfoldr a
 foldable = foldrAndContainer foldr
 
 -- | Elements of IntSet.
@@ -195,12 +197,12 @@ primArrayWithIndices pa = Unfoldr $ \step state ->
 
 -- | Elements of a vector
 {-# INLINE vector #-}
-vector :: GenericVector.Vector vector a => vector a -> Unfoldr a
+vector :: (GenericVector.Vector vector a) => vector a -> Unfoldr a
 vector vector = Unfoldr $ \step state -> GenericVector.foldr step state vector
 
 -- | Elements of a vector coming paired with indices
 {-# INLINE vectorWithIndices #-}
-vectorWithIndices :: GenericVector.Vector vector a => vector a -> Unfoldr (Int, a)
+vectorWithIndices :: (GenericVector.Vector vector a) => vector a -> Unfoldr (Int, a)
 vectorWithIndices vector = Unfoldr $ \step state -> GenericVector.ifoldr (\index a -> step (index, a)) state vector
 
 -- |
@@ -264,7 +266,7 @@ reverseHexadecimalDigits = reverseDigits 16
 -- @
 {-# INLINABLE reverseDigits #-}
 reverseDigits ::
-  Integral a =>
+  (Integral a) =>
   -- | Radix
   a ->
   -- | Number
@@ -300,8 +302,8 @@ zipWithIndex (Unfoldr unfoldr) = Unfoldr $ \indexedStep indexedState ->
 {-# DEPRECATED zipWithReverseIndex "This function builds up stack. Use 'zipWithIndex' instead." #-}
 zipWithReverseIndex :: Unfoldr a -> Unfoldr (Int, a)
 zipWithReverseIndex (Unfoldr unfoldr) = Unfoldr $ \step init ->
-  snd $
-    unfoldr
+  snd
+    $ unfoldr
       (\a (index, state) -> (succ index, step (index, a) state))
       (0, init)
 

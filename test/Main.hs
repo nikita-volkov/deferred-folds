@@ -2,19 +2,16 @@ module Main where
 
 import qualified Data.Text as Text
 import qualified DeferredFolds.Unfoldr as Unfoldr
-import qualified Test.QuickCheck as QuickCheck
-import Test.QuickCheck.Instances
-import qualified Test.QuickCheck.Property as QuickCheck
+import Test.QuickCheck.Instances ()
 import Test.Tasty
-import Test.Tasty.HUnit
 import Test.Tasty.QuickCheck
-import Test.Tasty.Runners
 import Prelude
 
+main :: IO ()
 main =
-  defaultMain $
-    testGroup "All" $
-      [ testProperty "List roundtrip" $ \(list :: [Int]) ->
+  defaultMain
+    $ testGroup "All"
+    $ [ testProperty "List roundtrip" $ \(list :: [Int]) ->
           list === toList (Unfoldr.foldable list),
         testProperty "take" $ \(list :: [Int], amount) ->
           take amount list
@@ -47,10 +44,6 @@ main =
                 c == '\n' || c == '\r'
               isSpaceButNotNewline c =
                 isSpace c && not (isNewline c)
-              normalize separator condition =
-                Text.split condition
-                  >>> filter (not . Text.null)
-                  >>> Text.intercalate separator
               expected =
                 text
                   & Text.split isNewline
