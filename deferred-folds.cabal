@@ -136,7 +136,7 @@ test-suite test
   main-is:            Main.hs
   build-depends:
     , deferred-folds
-    , quickcheck-instances >=0.3.11 && <0.4
+    , quickcheck-instances >=0.3.11 && <0.5
     , rerebase <2
     , tasty >=0.12 && <2
     , tasty-quickcheck >=0.9 && <0.12
